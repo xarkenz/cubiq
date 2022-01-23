@@ -5,6 +5,8 @@ if(APPLE)
 	set(CMAKE_PREFIX_PATH "/usr/local/cellar/qt@5/5.15.2_1") # Qt 5.15.2 installed with Homebrew
 elseif(UNIX)
 	set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu")
+elseif (WIN32)
+	set(CMAKE_PREFIX_PATH "C:/Qt/Qt-5.12.12")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
