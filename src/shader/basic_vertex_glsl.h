@@ -1,13 +1,17 @@
 // This is a header file serving only to hold GLSL code.
 R"(
-#version 330 core
+#version 120 // change?
+//#if __VERSION__ >= 130
+//  #define attribute in
+//  #define varying out
+//#endif
 
-layout (location = 0) in vec3 vPos;
-layout (location = 1) in vec4 vColor;
+attribute vec3 vPos;
+attribute vec4 vColor;
 
 uniform mat4 uProjection;
 
-out vec4 fColor;
+varying vec4 fColor;
 
 void main() {
   fColor = vColor;

@@ -19,7 +19,7 @@ protected:
 
     void adjustCamera();
 
-    GLuint createShader(const char* vertexSource, const char* fragmentSource);
+    GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);
 
 private:
     float clearR, clearG, clearB;

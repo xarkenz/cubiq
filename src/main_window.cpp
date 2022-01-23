@@ -8,8 +8,7 @@ MainWindow::MainWindow() :
         graphView(new GraphView(this)),
         equationDock(new QDockWidget(tr("Equations"), this)),
         equationList(new QListWidget(equationDock)) {
-    showMaximized();
-    setMinimumSize(400, 300);
+    setMinimumSize(800, 600);
     setWindowTitle("[*]Untitled Graph - Cubiq Grapher");
     setCentralWidget(graphView);
     createGraphView();

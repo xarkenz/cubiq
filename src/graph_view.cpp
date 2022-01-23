@@ -1,9 +1,6 @@
 #include "graph_view.h"
 
 #include <iostream>
-#include <string>
-
-#include <QtWidgets>
 
 
 const char* BASIC_VERTEX =
@@ -40,17 +37,25 @@ void GraphView::initializeGL() {
     glClearColor(clearR, clearG, clearB, 1);
 
     // Compile and link shader program
-    shaderProgram = createShader(BASIC_VERTEX, BASIC_FRAGMENT);
+    const char* attribs[] = {"vPos", "vColor"};
+    shaderProgram = createShader(BASIC_VERTEX, BASIC_FRAGMENT, 2, attribs);
+    glUseProgram(shaderProgram);
 
     // Generate vertex array object
     glGenVertexArrays(1, &vertexArray);
+    glBindVertexArray(vertexArray);
 
     // Generate vertex buffer object
     glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
-    // Configure vertex attributes (0 = position, 1 = color)
+    // Configure vertex attributes (0 = vec3 vPos, 1 = vec4 vColor)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*) (0));
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*) (3 * sizeof(GLfloat)));
+
+    // Unbind VAO/VBO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 
@@ -65,29 +70,40 @@ void GraphView::resizeGL(int w, int h) {
 void GraphView::paintGL() {
     initializeOpenGLFunctions();
 
+    // Temporary
+    GLfloat vertices[] = {
+            -50, -50, 0, 1, 0, 0, 1,
+            50, -50, 0, 0, 1, 0, 1,
+            0,  50, 0, 0, 0, 1, 1
+    };
+
     // Prepare the screen
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Attach shader
+    // Upload projection matrix to shader
     glUseProgram(shaderProgram);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, projection.data());
 
-    // Attach vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    // TODO: buffer stuff
-
-    // Attach vertex array
+    // Prepare VAO/VBO
     glBindVertexArray(vertexArray);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Enable vertex attributes
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    // TODO: draw
+    // Temporary
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // Detach shader/VAO
-    glUseProgram(0);
+    // Disable vertex attributes
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+
+    // Unbind VAO/VBO, stop using shader
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glUseProgram(0);
 }
 
 
@@ -106,7 +122,7 @@ void GraphView::adjustCamera() {
 }
 
 
-GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSource) {
+GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]) {
     initializeOpenGLFunctions();
 
     // Create shader objects
@@ -115,7 +131,6 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
 
     GLint status = GL_FALSE;
     int infoLogLength;
-    char* infoLog(nullptr);
 
     // Compile vertex shader
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
@@ -124,6 +139,7 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
         glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+        char infoLog[infoLogLength];
         glGetShaderInfoLog(vertexShader, infoLogLength, NULL, infoLog);
         std::cerr << infoLog << std::endl;
     }
@@ -135,6 +151,7 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
         glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+        char infoLog[infoLogLength];
         glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, infoLog);
         std::cerr << infoLog << std::endl;
     }
@@ -143,11 +160,17 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
     GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
+
+    for (int i = 0; i < attribCount; ++i) {
+        glBindAttribLocation(program, i, attribs[i]);
+    }
+
     glLinkProgram(program);
 
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status == GL_FALSE) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+        char infoLog[infoLogLength];
         glGetProgramInfoLog(program, infoLogLength, NULL, infoLog);
         std::cerr << infoLog << std::endl;
     }

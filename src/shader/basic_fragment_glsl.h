@@ -1,10 +1,14 @@
 // This is a header file serving only to hold GLSL code.
 R"(
-#version 330 core
+#version 120 // change?
+//#if __VERSION__ >= 130
+//  #define varying in
+//  out vec4 color;
+//#else
+  #define color gl_FragColor
+//#endif
 
-in vec4 fColor;
-
-out vec4 color;
+varying vec4 fColor;
 
 void main() {
   color = fColor;

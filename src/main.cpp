@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     parser.process(app);
 
     MainWindow mainWin;
-    mainWin.show();
+    mainWin.showMaximized();
 
     return QApplication::exec();
 }
