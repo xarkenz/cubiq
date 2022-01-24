@@ -23,10 +23,10 @@ GraphView::GraphView(QWidget* parent) :
         screenW = 0;
         screenH = 0;
 
-        graphL = -10;
-        graphR = 10;
-        graphB = -10;
-        graphT = 10;
+        graphL = -5;
+        graphR = 15;
+        graphB = -5;
+        graphT = 15;
 }
 
 
@@ -114,15 +114,15 @@ void GraphView::drawGrid() {
     for (float x = std::floor(graphL); x <= std::ceil(graphR); x += 1) {
         if (x != 0) {
             GLfloat line[] = {
-                    x, graphB * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
-                    x, graphT * aspect, 0, 0.3f, 0.3f, 0.3f, 1
+                    x, 0.5f * (graphT + graphB) + (graphT - graphB) * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
+                    x, 0.5f * (graphT + graphB) - (graphT - graphB) * aspect, 0, 0.3f, 0.3f, 0.3f, 1
             };
             glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
             bufferIndex += 2;
         }
     }
 
-    for (float y = std::floor(graphB * aspect); y <= std::ceil(graphT * aspect); y += 1) {
+    for (float y = std::floor(0.5f * (graphT + graphB) - (graphT - graphB) * aspect); y <= std::ceil(0.5f * (graphT + graphB) + (graphT - graphB) * aspect); y += 1) {
         if (y != 0) {
             GLfloat line[] = {
                     graphL, y, 0, 0.3f, 0.3f, 0.3f, 1,
@@ -137,8 +137,8 @@ void GraphView::drawGrid() {
     glDrawArrays(GL_LINES, first, bufferIndex - first);
 
     GLfloat axes[] = {
-            0, graphB * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
-            0, graphT * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, 0.5f * (graphT + graphB) - (graphT - graphB) * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, 0.5f * (graphT + graphB) + (graphT - graphB) * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
             graphL, 0, 0, 0.6f, 0.6f, 0.6f, 1,
             graphR, 0, 0, 0.6f, 0.6f, 0.6f, 1,
     };
@@ -151,7 +151,7 @@ void GraphView::drawGrid() {
 
 void GraphView::drawElements() {
     auto graphFunc = [](float x) -> float {
-        return 4.0f * sinf(x * 2.0f) + cosf(x);
+        return 4.0f * sinf(2.0f * x) + 2.5f * cosf(1.3f * x);
     };
 
     GLint first = bufferIndex;
