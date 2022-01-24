@@ -29,11 +29,24 @@ GLfloat* Function::getVertices(int &length, BoundingBox boundingBox, float preci
     length = std::floor((inMax - inMin + 1) / precision);
     GLfloat* vertices = new GLfloat[7 * length];
 
-    float in;
+    float in, out, x, y;
     for (int i = 0; i < length; i++) {
         in = inMin + i * precision;
-        vertices[7*i] = in;
-        vertices[7*i+1] = apply(in);
+        out = apply(in);
+
+        switch(inputVar) {
+            case Function::IndependentVariable::X:
+                x = in;
+                y = out;
+                break;
+            case Function::IndependentVariable::Y:
+                y = in;
+                x = out;
+                break;
+        }
+
+        vertices[7*i] = x;
+        vertices[7*i+1] = y;
         vertices[7*i+2] = 0;
         vertices[7*i+3] = 0.8f;
         vertices[7*i+4] = 0.2f;
