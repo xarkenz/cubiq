@@ -17,6 +17,10 @@ protected:
 
     void paintGL() override;
 
+    void drawGrid();
+
+    void drawElements();
+
     void adjustCamera();
 
     GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);
@@ -30,5 +34,7 @@ private:
     GLuint shaderProgram{};
     GLuint vertexArray{};
     GLuint vertexBuffer{};
+
+    GLint bufferIndex;
 
 };

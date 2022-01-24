@@ -1,5 +1,4 @@
 #include <QtWidgets>
-#include <Qt>
 
 #include "main_window.h"
 
@@ -28,7 +27,9 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 
 void MainWindow::createGraphView() {
-
+    QSurfaceFormat format;
+    format.setSamples(4);
+    graphView->setFormat(format);
 }
 
 

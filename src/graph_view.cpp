@@ -1,7 +1,11 @@
 #include "graph_view.h"
 
+#include <cmath>
 #include <iostream>
 
+#define BATCH_SIZE 1000
+
+const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
 const char* BASIC_VERTEX =
 #include "shader/basic_vertex_glsl.h"
@@ -29,7 +33,8 @@ GraphView::GraphView(QWidget* parent) :
 void GraphView::initializeGL() {
     initializeOpenGLFunctions();
 
-    // Configure alpha blending
+    // Configure rendering
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -63,19 +68,14 @@ void GraphView::resizeGL(int w, int h) {
     screenW = w;
     screenH = h;
 
+    setMinimumWidth(h / 8);
+
     adjustCamera();
 }
 
 
 void GraphView::paintGL() {
     initializeOpenGLFunctions();
-
-    // Temporary
-    GLfloat vertices[] = {
-            -50, -50, 0, 1, 0, 0, 1,
-            50, -50, 0, 0, 1, 0, 1,
-            0,  50, 0, 0, 0, 1, 1
-    };
 
     // Prepare the screen
     glClear(GL_COLOR_BUFFER_BIT);
@@ -86,33 +86,103 @@ void GraphView::paintGL() {
 
     // Prepare VAO/VBO
     glBindVertexArray(vertexArray);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Enable vertex attributes
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, BATCH_SIZE * VERTEX_BYTES, NULL, GL_DYNAMIC_DRAW);
 
-    // Temporary
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // Load geometry onto the buffer and draw
+    bufferIndex = 0;
+    drawGrid();
+    drawElements();
 
-    // Disable vertex attributes
+    // Unbind VAO/VBO
+    glBindVertexArray(0);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-
-    // Unbind VAO/VBO, stop using shader
-    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Stop using shader program
     glUseProgram(0);
 }
 
 
-void GraphView::adjustCamera() {
-    projection.setToIdentity();
-    projection.ortho(-.5f * screenW, .5f * screenW, -.5f * screenH, .5f * screenH, 0, 100);
+void GraphView::drawGrid() {
+    const float aspect = (float) screenH / screenW;
+    GLint first = bufferIndex;
 
-    QVector3D viewEye(.5f * (graphL + graphR), .5f * (graphB + graphT), 20);
-    QVector3D viewCenter(.5f * (graphL + graphR), .5f * (graphB + graphT), -1);
+    for (float x = std::floor(graphL); x <= std::ceil(graphR); x += 1) {
+        if (x != 0) {
+            GLfloat line[] = {
+                    x, graphB * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
+                    x, graphT * aspect, 0, 0.3f, 0.3f, 0.3f, 1
+            };
+            glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
+            bufferIndex += 2;
+        }
+    }
+
+    for (float y = std::floor(graphB * aspect); y <= std::ceil(graphT * aspect); y += 1) {
+        if (y != 0) {
+            GLfloat line[] = {
+                    graphL, y, 0, 0.3f, 0.3f, 0.3f, 1,
+                    graphR, y, 0, 0.3f, 0.3f, 0.3f, 1
+            };
+            glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
+            bufferIndex += 2;
+        }
+    }
+
+    glLineWidth(1);
+    glDrawArrays(GL_LINES, first, bufferIndex - first);
+
+    GLfloat axes[] = {
+            0, graphB * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, graphT * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            graphL, 0, 0, 0.6f, 0.6f, 0.6f, 1,
+            graphR, 0, 0, 0.6f, 0.6f, 0.6f, 1,
+    };
+    glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 4 * VERTEX_BYTES, axes);
+    glLineWidth(2);
+    glDrawArrays(GL_LINES, bufferIndex, 4);
+    bufferIndex += 4;
+}
+
+
+void GraphView::drawElements() {
+    auto graphFunc = [](float x) -> float {
+        return 4.0f * sinf(x * 2.0f) + cosf(x);
+    };
+
+    GLint first = bufferIndex;
+    float spacing = 3 * (graphR - graphL) / screenW;
+
+    for (float x = std::floor(graphL); x <= std::ceil(graphR) + spacing; x += spacing) {
+        GLfloat vertex[] = {
+                x, graphFunc(x), 0, 0.8f, 0.2f, 0.1f, 1
+        };
+        glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, VERTEX_BYTES, vertex);
+        ++bufferIndex;
+    }
+
+    glLineWidth(2.5f);
+    glDrawArrays(GL_LINE_STRIP, first, bufferIndex - first);
+}
+
+
+void GraphView::adjustCamera() {
+    const float aspect = (float) screenH / screenW;
+
+    projection.setToIdentity();
+    projection.ortho(
+            -0.5f * (graphR - graphL),
+            0.5f * (graphR - graphL),
+            -0.5f * (graphT - graphB) * aspect,
+            0.5f * (graphT - graphB) * aspect,
+            0, 100);
+
+    QVector3D viewEye(0.5f * (graphR + graphL), 0.5f * (graphT + graphB), 20);
+    QVector3D viewCenter(0.5f * (graphR + graphL), 0.5f * (graphT + graphB), -1);
     QVector3D viewUp(0, 1, 0);
 
     QMatrix4x4 view;
