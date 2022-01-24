@@ -14,8 +14,10 @@ const char* BASIC_FRAGMENT =
 #include "shader/basic_fragment_glsl.h"
 
 
-GraphView::GraphView(QWidget* parent) :
+GraphView::GraphView(QWidget* parent, Graph* g) :
             QOpenGLWidget(parent) {
+        graph = g;
+
         clearR = .1f;
         clearG = .1f;
         clearB = .1f;
@@ -23,11 +25,10 @@ GraphView::GraphView(QWidget* parent) :
         screenW = 0;
         screenH = 0;
 
-        graphL = -5;
-        graphR = 15;
-        graphB = -5;
-        graphT = 15;
 }
+
+void GraphView::setGraph(Graph* g) {graph = g;}
+Graph* GraphView::getGraph() {return graph;}
 
 
 void GraphView::initializeGL() {
@@ -111,22 +112,22 @@ void GraphView::drawGrid() {
     const float aspect = (float) screenH / screenW;
     GLint first = bufferIndex;
 
-    for (float x = std::floor(graphL); x <= std::ceil(graphR); x += 1) {
+    for (float x = std::floor(graph->getBoundingBox().minX); x <= std::ceil(graph->getBoundingBox().maxX); x += 1) {
         if (x != 0) {
             GLfloat line[] = {
-                    x, 0.5f * (graphT + graphB) + (graphT - graphB) * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
-                    x, 0.5f * (graphT + graphB) - (graphT - graphB) * aspect, 0, 0.3f, 0.3f, 0.3f, 1
+                    x, graph->getBoundingBox().centerY()+ graph->getBoundingBox().height() * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
+                    x, graph->getBoundingBox().centerY()- graph->getBoundingBox().height() * aspect, 0, 0.3f, 0.3f, 0.3f, 1
             };
             glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
             bufferIndex += 2;
         }
     }
 
-    for (float y = std::floor(0.5f * (graphT + graphB) - (graphT - graphB) * aspect); y <= std::ceil(0.5f * (graphT + graphB) + (graphT - graphB) * aspect); y += 1) {
+    for (float y = std::floor(graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect); y <= std::ceil(graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect); y += 1) {
         if (y != 0) {
             GLfloat line[] = {
-                    graphL, y, 0, 0.3f, 0.3f, 0.3f, 1,
-                    graphR, y, 0, 0.3f, 0.3f, 0.3f, 1
+                    graph->getBoundingBox().minX, y, 0, 0.3f, 0.3f, 0.3f, 1,
+                    graph->getBoundingBox().maxX, y, 0, 0.3f, 0.3f, 0.3f, 1
             };
             glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
             bufferIndex += 2;
@@ -137,10 +138,10 @@ void GraphView::drawGrid() {
     glDrawArrays(GL_LINES, first, bufferIndex - first);
 
     GLfloat axes[] = {
-            0, 0.5f * (graphT + graphB) - (graphT - graphB) * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
-            0, 0.5f * (graphT + graphB) + (graphT - graphB) * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
-            graphL, 0, 0, 0.6f, 0.6f, 0.6f, 1,
-            graphR, 0, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
+            graph->getBoundingBox().minX, 0, 0, 0.6f, 0.6f, 0.6f, 1,
+            graph->getBoundingBox().maxX, 0, 0, 0.6f, 0.6f, 0.6f, 1,
     };
     glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 4 * VERTEX_BYTES, axes);
     glLineWidth(2);
@@ -150,6 +151,22 @@ void GraphView::drawGrid() {
 
 
 void GraphView::drawElements() {
+
+    float precision = 3 * graph->getBoundingBox().width() / screenW;
+
+    graph->calculateVertices(precision); // To be moved to another thread
+
+    int length;
+    GLfloat* vertices = graph->getVertices(length);
+
+    glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, length*VERTEX_BYTES, vertices);
+
+    glLineWidth(2.5f);
+    glDrawArrays(GL_LINE_STRIP, bufferIndex, length);
+
+    bufferIndex += length;
+
+    /*
     auto graphFunc = [](float x) -> float {
         return 4.0f * sinf(2.0f * x) + 2.5f * cosf(1.3f * x);
     };
@@ -167,6 +184,7 @@ void GraphView::drawElements() {
 
     glLineWidth(2.5f);
     glDrawArrays(GL_LINE_STRIP, first, bufferIndex - first);
+    */
 }
 
 
@@ -175,14 +193,14 @@ void GraphView::adjustCamera() {
 
     projection.setToIdentity();
     projection.ortho(
-            -0.5f * (graphR - graphL),
-            0.5f * (graphR - graphL),
-            -0.5f * (graphT - graphB) * aspect,
-            0.5f * (graphT - graphB) * aspect,
+            -0.5f * graph->getBoundingBox().width(),
+            0.5f * graph->getBoundingBox().width(),
+            -0.5f * graph->getBoundingBox().height() * aspect,
+            0.5f * graph->getBoundingBox().height() * aspect,
             0, 100);
 
-    QVector3D viewEye(0.5f * (graphR + graphL), 0.5f * (graphT + graphB), 20);
-    QVector3D viewCenter(0.5f * (graphR + graphL), 0.5f * (graphT + graphB), -1);
+    QVector3D viewEye(graph->getBoundingBox().centerX(), graph->getBoundingBox().centerY(), 20);
+    QVector3D viewCenter(graph->getBoundingBox().centerX(), graph->getBoundingBox().centerY(), -1);
     QVector3D viewUp(0, 1, 0);
 
     QMatrix4x4 view;

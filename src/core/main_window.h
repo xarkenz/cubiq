@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QListWidget>
 
-#include "graph_view.h"
+#include "core/graph_view.h"
 
 
 class MainWindow : public QMainWindow {

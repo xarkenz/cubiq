@@ -20,7 +20,8 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(cubiq src/main.cpp src/main_window.cpp src/graph_view.cpp)
+include_directories(BEFORE src)
+add_executable(cubiq src/core/main.cpp src/core/main_window.cpp src/core/graph_view.cpp src/core/graph.cpp src/equations/function.cpp)
 target_link_libraries(cubiq
         Qt5::Core
         Qt5::Gui
