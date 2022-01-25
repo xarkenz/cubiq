@@ -27,6 +27,8 @@ GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
         screenH = 0;
 
         bufferIndex = 0;
+
+        dragStartBounds = {0, 0, 0, 0};
 }
 
 void GraphView::setGraph(Graph* g) {graph = g;}
@@ -197,6 +199,24 @@ void GraphView::drawElements() {
 }
 
 
+void GraphView::mousePressEvent(QMouseEvent* event) {
+    dragStartPos = event->pos();
+    dragStartBounds = graph->getBoundingBox();
+}
+
+
+void GraphView::mouseMoveEvent(QMouseEvent* event) {
+    const float aspect = (float) screenH / (float) screenW;
+
+    graph->setBoundingBox(dragStartBounds.moved(
+            dragStartBounds.width() * (float) (dragStartPos.x() - event->x()) / (float) screenW,
+            dragStartBounds.height() * aspect * (float) (event->y() - dragStartPos.y()) / (float) screenH));
+
+    adjustCamera();
+    update();
+}
+
+
 void GraphView::wheelEvent(QWheelEvent* event) {
     QPoint pixelScroll = event->pixelDelta();
     QPoint angleScroll = event->angleDelta() / 8;
@@ -232,7 +252,7 @@ void GraphView::zoom(float steps) {
 
 
 void GraphView::adjustCamera() {
-    const float aspect = (float) screenH / screenW;
+    const float aspect = (float) screenH / (float) screenW;
 
     projection.setToIdentity();
     projection.ortho(

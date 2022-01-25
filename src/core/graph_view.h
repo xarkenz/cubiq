@@ -22,6 +22,8 @@ protected:
     void drawGrid();
     void drawElements();
 
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
 
     void zoom(float steps);
@@ -42,5 +44,8 @@ private:
     GLuint vertexBuffer{};
 
     GLint bufferIndex;
+
+    QPoint dragStartPos;
+    BoundingBox dragStartBounds;
 
 };
