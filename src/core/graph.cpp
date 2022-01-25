@@ -9,6 +9,10 @@ BoundingBox Graph::getBoundingBox() {
     return boundingBox;
 }
 
+void Graph::setBoundingBox(BoundingBox bb) {
+    boundingBox = bb;
+}
+
 // segIndices is a list of vertex indices representing where each segment ends
 // The last element will be the total number of vertices
 GLfloat* Graph::getVertices(int*& segIndices, int& numSegs) {

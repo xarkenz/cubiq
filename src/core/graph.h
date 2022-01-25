@@ -14,6 +14,7 @@ public:
     GLfloat* getVertices(int*& segIndices, int& numSegs);
     void calculateVertices(float precision);
     BoundingBox getBoundingBox();
+    void setBoundingBox(BoundingBox bb);
 
     explicit Graph(BoundingBox bb);
     Graph();

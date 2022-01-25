@@ -16,15 +16,15 @@ public:
 
 protected:
     void initializeGL() override;
-
     void resizeGL(int w, int h) override;
-
     void paintGL() override;
 
     void drawGrid();
-
     void drawElements();
 
+    void wheelEvent(QWheelEvent* event) override;
+
+    void zoom(float steps);
     void adjustCamera();
 
     GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);

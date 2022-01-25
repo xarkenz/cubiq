@@ -3,7 +3,9 @@
 #include <cmath>
 #include <iostream>
 
-#define BATCH_SIZE 2000
+#include <QWheelEvent>
+
+#define BATCH_SIZE 4000
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
@@ -12,6 +14,7 @@ const char* BASIC_VERTEX =
 
 const char* BASIC_FRAGMENT =
 #include "shader/basic_fragment_glsl.h"
+
 
 GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
         graph = g;
@@ -24,7 +27,6 @@ GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
         screenH = 0;
 
         bufferIndex = 0;
-
 }
 
 void GraphView::setGraph(Graph* g) {graph = g;}
@@ -192,6 +194,40 @@ void GraphView::drawElements() {
     glLineWidth(2.5f);
     glDrawArrays(GL_LINE_STRIP, first, bufferIndex - first);
     */
+}
+
+
+void GraphView::wheelEvent(QWheelEvent* event) {
+    QPoint pixelScroll = event->pixelDelta();
+    QPoint angleScroll = event->angleDelta() / 8;
+
+    if (!pixelScroll.isNull()) {
+        zoom((float) pixelScroll.y() / 50); // TODO: Needs testing with high-resolution scroll
+    } else if (!angleScroll.isNull()) {
+        // Usually 15 degrees per step
+        zoom((float) angleScroll.y() / 15);
+    }
+
+    event->accept();
+}
+
+
+void GraphView::zoom(float steps) {
+    const float sensitivity = 0.1f;
+    BoundingBox bounds = graph->getBoundingBox();
+
+    float z = 1 - sensitivity * steps;
+
+    BoundingBox newBounds = {
+            bounds.centerX() - bounds.width() * 0.5f * z,
+            bounds.centerX() + bounds.width() * 0.5f * z,
+            bounds.centerY() - bounds.height() * 0.5f * z,
+            bounds.centerY() + bounds.height() * 0.5f * z
+    };
+    graph->setBoundingBox(newBounds);
+
+    adjustCamera();
+    update();
 }
 
 
