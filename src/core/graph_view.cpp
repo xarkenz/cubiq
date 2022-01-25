@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-#define BATCH_SIZE 1000
+#define BATCH_SIZE 2000
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
@@ -13,9 +13,7 @@ const char* BASIC_VERTEX =
 const char* BASIC_FRAGMENT =
 #include "shader/basic_fragment_glsl.h"
 
-
-GraphView::GraphView(QWidget* parent, Graph* g) :
-            QOpenGLWidget(parent) {
+GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
         graph = g;
 
         clearR = .1f;
@@ -24,6 +22,8 @@ GraphView::GraphView(QWidget* parent, Graph* g) :
 
         screenW = 0;
         screenH = 0;
+
+        bufferIndex = 0;
 
 }
 
@@ -156,15 +156,22 @@ void GraphView::drawElements() {
 
     graph->calculateVertices(precision); // To be moved to another thread
 
-    int length;
-    GLfloat* vertices = graph->getVertices(length);
+    int* segmentIndices; // See Graph::getVertices() for more information
+    int numSegs;
+    GLfloat* vertices = graph->getVertices(segmentIndices, numSegs);
 
-    glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, length*VERTEX_BYTES, vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, segmentIndices[numSegs-1]*VERTEX_BYTES, vertices);
 
     glLineWidth(2.5f);
-    glDrawArrays(GL_LINE_STRIP, bufferIndex, length);
 
-    bufferIndex += length;
+    int count, lastIndex = 0;
+    for (int i = 0; i < numSegs; i++) {
+        count = segmentIndices[i]-lastIndex;
+        lastIndex = segmentIndices[i];
+        glDrawArrays(GL_LINE_STRIP, bufferIndex, count);
+        bufferIndex += count;
+    }
+
 
     /*
     auto graphFunc = [](float x) -> float {

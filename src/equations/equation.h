@@ -8,8 +8,18 @@ class Equation {
     // TODO: add color
 
 public:
+
+    struct DisplaySettings {
+        float r, g, b, a;
+    };
+
+
+    explicit Equation(DisplaySettings settings) {displaySettings = settings;}
     virtual ~Equation(){};
 
-    virtual GLfloat* getVertices(int &length, BoundingBox boundingBox, float precision) = 0;
+    virtual GLfloat* getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) = 0;
+
+protected:
+    DisplaySettings displaySettings{};
 
 };

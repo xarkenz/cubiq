@@ -3,8 +3,8 @@
 struct BoundingBox {
     float minX, maxX, minY, maxY;
 
-    float width() {return maxX - minX;}
-    float height() {return maxY - minY;}
-    float centerX() {return 0.5f*(maxX+minX);}
-    float centerY() {return 0.5f*(maxY+minY);}
+    float width() const {return maxX - minX;}
+    float height() const {return maxY - minY;}
+    float centerX() const {return 0.5f*(maxX+minX);}
+    float centerY() const {return 0.5f*(maxY+minY);}
 };

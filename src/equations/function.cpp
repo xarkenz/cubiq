@@ -2,7 +2,7 @@
 #include <cmath>
 #include "function.h"
 
-Function::Function(Function::IndependentVariable inVar, float (*func)(float)) {
+Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, float (*func)(float)) : Equation(settings) {
     inputVar = inVar;
     function = func;
 }
@@ -12,27 +12,51 @@ double Function::apply(float input) {
 }
 
 
-GLfloat* Function::getVertices(int &length, BoundingBox boundingBox, float precision) {
+GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) {
 
-    float inMin = 0, inMax = 0;
+    float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
     switch(inputVar) {
         case Function::IndependentVariable::X:
             inMin = std::floor(boundingBox.minX);
             inMax = std::ceil(boundingBox.maxX);
+            outMin = std::floor(boundingBox.minY);
+            outMax = std::ceil(boundingBox.maxY);
             break;
         case Function::IndependentVariable::Y:
             inMin = std::floor(boundingBox.minY);
             inMax = std::ceil(boundingBox.maxY);
+            outMin = std::floor(boundingBox.minX);
+            outMax = std::ceil(boundingBox.maxX);
             break;
     }
 
-    length = std::floor((inMax - inMin + 1) / precision);
-    GLfloat* vertices = new GLfloat[7 * length];
+    int numVertices = std::floor((inMax - inMin + 1) / precision);
+    GLfloat* vertices = new GLfloat[7 * numVertices];
 
-    float in, out, x, y;
-    for (int i = 0; i < length; i++) {
+    segIndices = new int[numVertices/2]; // Allocating more space than needed
+    numSegs = 0;
+
+    float in, out, nextOut, x, y;
+    int vertIndex = 0;
+    bool outOfBounds = false;
+    for (int i = 0; i < numVertices; i++) {
         in = inMin + i * precision;
         out = apply(in);
+
+        if (out > outMax || out < outMin) {
+            nextOut = apply(in+precision);
+            if (nextOut <= outMax && nextOut >= outMin) {
+                outOfBounds = false;
+            } else {
+                if (outOfBounds) {
+                    continue;
+                }
+                outOfBounds = true;
+                segIndices[numSegs++] = vertIndex + 1;
+            }
+        } else {
+            outOfBounds = false;
+        }
 
         switch(inputVar) {
             case Function::IndependentVariable::X:
@@ -45,14 +69,16 @@ GLfloat* Function::getVertices(int &length, BoundingBox boundingBox, float preci
                 break;
         }
 
-        vertices[7*i] = x;
-        vertices[7*i+1] = y;
-        vertices[7*i+2] = 0;
-        vertices[7*i+3] = 0.8f;
-        vertices[7*i+4] = 0.2f;
-        vertices[7*i+5] = 0.1f;
-        vertices[7*i+6] = 1.0f;
+        vertices[7*vertIndex] = x;
+        vertices[7*vertIndex+1] = y;
+        vertices[7*vertIndex+2] = 0;
+        vertices[7*vertIndex+3] = displaySettings.r;
+        vertices[7*vertIndex+4] = displaySettings.g;
+        vertices[7*vertIndex+5] = displaySettings.b;
+        vertices[7*(vertIndex++)+6] = displaySettings.a;
     }
+
+    segIndices[numSegs++] = vertIndex;
 
     return vertices;
 }

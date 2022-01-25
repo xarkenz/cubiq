@@ -11,11 +11,11 @@ class Graph {
 public:
 
 
-    GLfloat* getVertices(int &length);
+    GLfloat* getVertices(int*& segIndices, int& numSegs);
     void calculateVertices(float precision);
     BoundingBox getBoundingBox();
 
-    Graph(BoundingBox bb);
+    explicit Graph(BoundingBox bb);
     Graph();
 
     void addEquation(Equation* e);
@@ -24,6 +24,7 @@ private:
     std::vector<Equation*> equationList;
 
     std::vector<GLfloat> vertices;
+    std::vector<int> segmentIndices;
 
     BoundingBox boundingBox;
 

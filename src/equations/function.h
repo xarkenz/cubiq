@@ -8,9 +8,9 @@ public:
 
     enum class IndependentVariable {X, Y};
 
-    Function(IndependentVariable inVar, float (*func)(float));
+    Function(DisplaySettings settings, IndependentVariable inVar, float (*func)(float));
 
-    GLfloat* getVertices(int &length, BoundingBox boundingBox, float precision) override;
+    GLfloat* getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) override;
 
     double apply(float input);
 

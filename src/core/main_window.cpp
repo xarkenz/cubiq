@@ -33,12 +33,23 @@ void MainWindow::createGraphView() {
     graphView->setFormat(format);
 
     Graph* graph = graphView->getGraph();
-    auto graphFunc = [](float x) -> float {
-        return 4.0f * sinf(x * 2.0f) + cosf(x);
-    };
 
-    Equation* func = new Function(Function::IndependentVariable::X, graphFunc);
-    graph->addEquation(func);
+
+    auto testFunc1 = [](float x) -> float {return 4.0f * sinf(x * 2.0f) + cosf(x);};
+    Equation::DisplaySettings ds1 {0.8f,0.2f,0.2f,1.0f};
+    Equation* eq1 = new Function(ds1, Function::IndependentVariable::X, testFunc1);
+    graph->addEquation(eq1);
+
+    auto testFunc2 = [](float y) -> float {return y*y*y*y/16 - y*y*y*5/8 + y*y + y*2;};
+    Equation::DisplaySettings ds2 {0.2f,0.2f,0.8f,1.0f};
+    Equation* eq2 = new Function(ds2, Function::IndependentVariable::Y, testFunc2);
+    graph->addEquation(eq2);
+
+    auto testFunc3 = [](float x) -> float {return tanf(x);};
+    Equation::DisplaySettings ds3 {0.2f,0.8f,0.2f,1.0f};
+    Equation* eq3 = new Function(ds3, Function::IndependentVariable::X, testFunc3);
+    graph->addEquation(eq3);
+
 }
 
 
