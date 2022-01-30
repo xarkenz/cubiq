@@ -21,10 +21,10 @@ void ImplicitEquation::writeVertex(GLfloat* vertices, int vertIndex, float x, fl
 }
 
 GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) {
-    int gridWidth = std::ceil(boundingBox.width()/precision);
-    int gridHeight = std::ceil(boundingBox.height()/precision);
-    int numVertices = 2 * gridWidth*gridHeight;
-    GLfloat* vertices = new GLfloat[7 * numVertices]; // At most 4 vertices per cell
+    int gridWidth = std::ceil(boundingBox.maxX/precision)-std::floor(boundingBox.minX/precision);
+    int gridHeight = std::ceil(boundingBox.maxY/precision)-std::floor(boundingBox.minY/precision);
+    int numVertices = 4 * gridWidth*gridHeight; // At most 4 vertices per cell
+    GLfloat* vertices = new GLfloat[7 * numVertices];
 
     segIndices = new int[numVertices/2]; // 1 segment per 2 vertices
     numSegs = 0;
@@ -33,9 +33,9 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
     float values[gridHeight+1][gridWidth+1];
     float x,y;
     for (int xInd = 0; xInd<gridWidth+1; xInd++) {
-        x = boundingBox.minX + precision*xInd;
+        x = (std::floor(boundingBox.minX/precision) + xInd)*precision;
         for (int yInd = 0; yInd<gridHeight+1; yInd++) {
-            y = boundingBox.minY + precision*yInd;
+            y = (std::floor(boundingBox.minY/precision) + yInd)*precision;
             values[yInd][xInd] = apply(x,y);
         }
     }
@@ -60,9 +60,9 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
 
             v1 = v2 = v3 = v4 = false;
 
-            l = boundingBox.minX + precision*x;
+            l = (std::floor(boundingBox.minX/precision) + x)*precision;
             r = l + precision;
-            b = boundingBox.minY + precision*y;
+            b = (std::floor(boundingBox.minY/precision) + y)*precision;
             t = b + precision;
 
             if ((tl >= 0 and tr <= 0) or (tl <= 0 and tr >= 0)) {

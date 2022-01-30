@@ -17,20 +17,20 @@ GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox bound
     float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
     switch(inputVar) {
         case Function::IndependentVariable::X:
-            inMin = std::floor(boundingBox.minX);
-            inMax = std::ceil(boundingBox.maxX);
-            outMin = std::floor(boundingBox.minY);
-            outMax = std::ceil(boundingBox.maxY);
+            inMin = std::floor(boundingBox.minX/precision);
+            inMax = std::ceil(boundingBox.maxX/precision);
+            outMin = std::floor(boundingBox.minY/precision);
+            outMax = std::ceil(boundingBox.maxY/precision);
             break;
         case Function::IndependentVariable::Y:
-            inMin = std::floor(boundingBox.minY);
-            inMax = std::ceil(boundingBox.maxY);
-            outMin = std::floor(boundingBox.minX);
-            outMax = std::ceil(boundingBox.maxX);
+            inMin = std::floor(boundingBox.minY/precision);
+            inMax = std::ceil(boundingBox.maxY/precision);
+            outMin = std::floor(boundingBox.minX/precision);
+            outMax = std::ceil(boundingBox.maxX/precision);
             break;
     }
 
-    int numVertices = 1 + std::ceil((inMax - inMin) / precision);
+    int numVertices = inMax - inMin + 1;
     GLfloat* vertices = new GLfloat[7 * numVertices];
 
     segIndices = new int[numVertices/2]; // Allocating more space than needed
@@ -40,12 +40,12 @@ GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox bound
     int vertIndex = 0;
     bool outOfBounds = false;
     for (int i = 0; i < numVertices; i++) {
-        in = inMin + i * precision;
+        in = (inMin + i) * precision;
         out = apply(in);
 
         if (out > outMax || out < outMin) {
             nextOut = apply(in+precision);
-            if (nextOut <= outMax && nextOut >= outMin) {
+            if (nextOut <= outMax*precision && nextOut >= outMin*precision) {
                 outOfBounds = false;
             } else {
                 if (outOfBounds) {

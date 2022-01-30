@@ -32,12 +32,14 @@ void Graph::calculateVertices(float precision) {
     for (Equation* e : equationList) {
         verts = e->getVertices(segIndices, numSegs, boundingBox, precision);
 
-        vertCount = segIndices[numSegs-1];
+        if (numSegs > 0) {
+            vertCount = segIndices[numSegs - 1];
 
-        for (int i = 0; i < numSegs; i++) {segIndices[i] += vertices.size()/7;}
+            for (int i = 0; i < numSegs; i++) { segIndices[i] += vertices.size() / 7; }
 
-        vertices.insert(vertices.end(), verts, verts + vertCount*7);
-        segmentIndices.insert(segmentIndices.end(), segIndices, segIndices+numSegs);
+            vertices.insert(vertices.end(), verts, verts + vertCount * 7);
+            segmentIndices.insert(segmentIndices.end(), segIndices, segIndices + numSegs);
+        }
 
         delete verts;
         delete segIndices;

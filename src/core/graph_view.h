@@ -26,7 +26,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
 
-    void zoom(float steps);
+    void zoom(float steps, QPointF pos);
     void adjustCamera();
 
     GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);

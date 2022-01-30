@@ -222,27 +222,31 @@ void GraphView::wheelEvent(QWheelEvent* event) {
     QPoint angleScroll = event->angleDelta() / 8;
 
     if (!pixelScroll.isNull()) {
-        zoom((float) pixelScroll.y() / 50); // TODO: Needs testing with high-resolution scroll
+        zoom((float) pixelScroll.y() / 50, event->position()); // TODO: Needs testing with high-resolution scroll
     } else if (!angleScroll.isNull()) {
         // Usually 15 degrees per step
-        zoom((float) angleScroll.y() / 15);
+        zoom((float) angleScroll.y() / 15, event->position());
     }
 
     event->accept();
 }
 
 
-void GraphView::zoom(float steps) {
+void GraphView::zoom(float steps, QPointF pos) {
     const float sensitivity = 0.1f;
     BoundingBox bounds = graph->getBoundingBox();
 
-    float z = 1 - sensitivity * steps;
+    const float aspect = (float) screenH / (float) screenW;
+    float posX = bounds.minX + ((float) pos.x()/screenW) * bounds.width();
+    float posY = bounds.minY + (0.5 - (((float) pos.y()/screenH)-0.5)*aspect) * bounds.height();
+
+    float z = std::fmaxf(1 - sensitivity * steps, sensitivity);
 
     BoundingBox newBounds = {
-            bounds.centerX() - bounds.width() * 0.5f * z,
-            bounds.centerX() + bounds.width() * 0.5f * z,
-            bounds.centerY() - bounds.height() * 0.5f * z,
-            bounds.centerY() + bounds.height() * 0.5f * z
+            posX - (posX - bounds.minX) * z,
+            posX + (bounds.maxX - posX) * z,
+            posY - (posY - bounds.minY) * z,
+            posY + (bounds.maxY - posY) * z
     };
     graph->setBoundingBox(newBounds);
 
