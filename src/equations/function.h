@@ -12,7 +12,7 @@ public:
 
     GLfloat* getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) override;
 
-    double apply(float input);
+    float apply(float input);
 
 private:
     IndependentVariable inputVar;

@@ -7,7 +7,7 @@ class ImplicitEquation : public Equation {
 public:
 
     ImplicitEquation(DisplaySettings settings, float (*func)(float,float));
-    double apply(float x, float y); // Function drawn where apply(x,y)=0
+    float apply(float x, float y); // Function drawn where apply(x,y)=0
 
     GLfloat* getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) override;
 

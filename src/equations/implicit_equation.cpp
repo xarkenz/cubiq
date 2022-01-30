@@ -1,12 +1,11 @@
 #include <cmath>
 #include "implicit_equation.h"
-#include <iostream>
 
 ImplicitEquation::ImplicitEquation(DisplaySettings settings, float (*func)(float,float)) : Equation(settings) {
     function = func;
 }
 
-double ImplicitEquation::apply(float x, float y) {
+float ImplicitEquation::apply(float x, float y) {
     return (*function)(x,y);
 }
 
@@ -17,7 +16,7 @@ void ImplicitEquation::writeVertex(GLfloat* vertices, int vertIndex, float x, fl
     vertices[7*vertIndex+3] = displaySettings.r;
     vertices[7*vertIndex+4] = displaySettings.g;
     vertices[7*vertIndex+5] = displaySettings.b;
-    vertices[7*(vertIndex++)+6] = displaySettings.a;
+    vertices[7*vertIndex+6] = displaySettings.a;
 }
 
 GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) {

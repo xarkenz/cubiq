@@ -7,7 +7,7 @@ Function::Function(DisplaySettings settings, Function::IndependentVariable inVar
     function = func;
 }
 
-double Function::apply(float input) {
+float Function::apply(float input) {
     return (*function)(input);
 }
 
