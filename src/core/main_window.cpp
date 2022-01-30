@@ -56,6 +56,11 @@ void MainWindow::createGraphView() {
     Equation* eq4 = new ImplicitEquation(ds4, testFunc4);
     graph->addEquation(eq4);
 
+    auto testFunc5 = [](float x, float y) -> float {return x*y;};
+    Equation::DisplaySettings ds5 {0.8f,0.2f,0.8f,1.0f};
+    Equation* eq5 = new ImplicitEquation(ds5, testFunc5);
+    graph->addEquation(eq5);
+
 }
 
 

@@ -54,7 +54,7 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
             bl = values[y][x];
             br = values[y][x+1];
 
-            if ((tl > 0 and tr > 0 and bl > 0 and br > 0) or (tl < 0 and tr < 0 and bl < 0 and br < 0)) {
+            if ((tl > 0 and tr > 0 and bl > 0 and br > 0) or (tl < 0 and tr < 0 and bl < 0 and br < 0) or (tl == 0 and tr == 0 and bl == 0 and br == 0)) {
                 continue;
             }
 
@@ -65,24 +65,37 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
             b = (std::floor(boundingBox.minY/precision) + y)*precision;
             t = b + precision;
 
-            if ((tl >= 0 and tr <= 0) or (tl <= 0 and tr >= 0)) {
+
+            if (bl == 0 and br == 0) {
+                writeVertex(vertices, vertIndex++, l, b);
+                writeVertex(vertices, vertIndex++, r, b);
+                segIndices[numSegs++] = vertIndex;
+            }
+            if (tl == 0 and bl == 0) {
+                writeVertex(vertices, vertIndex++, l, t);
+                writeVertex(vertices, vertIndex++, l, b);
+                segIndices[numSegs++] = vertIndex;
+            }
+
+
+            if ((tl > 0 and tr < 0) or (tl < 0 and tr > 0)) {
                 v1 = true;
                 v1y = t;
                 v1x = (tl/(tl-tr))*precision + l;
             }
-            if ((bl >= 0 and br <= 0) or (bl <= 0 and br >= 0)) {
+            if ((bl > 0 and br < 0) or (bl < 0 and br > 0)) {
                 v2 = true;
                 v2y = b;
                 v2x = (bl/(bl-br))*precision + l;
             }
 
-            if ((bl >= 0 and tl <= 0) or (bl <= 0 and tl >= 0)) {
+            if ((bl > 0 and tl < 0) or (bl < 0 and tl > 0)) {
                 v3 = true;
                 v3x = l;
                 v3y = (bl/(bl-tl))*precision + b;
             }
 
-            if ((br >= 0 and tr <= 0) or (br <= 0 and tr >= 0)) {
+            if ((br > 0 and tr < 0) or (br < 0 and tr > 0)) {
                 v4 = true;
                 v4x = r;
                 v4y = (br/(br-tr))*precision + b;
