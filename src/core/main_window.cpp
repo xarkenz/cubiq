@@ -2,6 +2,7 @@
 
 #include "main_window.h"
 #include "../equations/function.h"
+#include "equations/implicit_equation.h"
 
 
 MainWindow::MainWindow() :
@@ -49,6 +50,11 @@ void MainWindow::createGraphView() {
     Equation::DisplaySettings ds3 {0.2f,0.8f,0.2f,1.0f};
     Equation* eq3 = new Function(ds3, Function::IndependentVariable::X, testFunc3);
     graph->addEquation(eq3);
+
+    auto testFunc4 = [](float x, float y) -> float {return x*x/4 + y*y/2 + (x+2)*y/3 - 5;};
+    Equation::DisplaySettings ds4 {0.8f,0.8f,0.2f,1.0f};
+    Equation* eq4 = new ImplicitEquation(ds4, testFunc4);
+    graph->addEquation(eq4);
 
 }
 

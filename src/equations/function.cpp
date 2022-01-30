@@ -30,7 +30,7 @@ GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox bound
             break;
     }
 
-    int numVertices = std::floor((inMax - inMin + 1) / precision);
+    int numVertices = 1 + std::ceil((inMax - inMin) / precision);
     GLfloat* vertices = new GLfloat[7 * numVertices];
 
     segIndices = new int[numVertices/2]; // Allocating more space than needed

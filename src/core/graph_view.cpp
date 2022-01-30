@@ -5,7 +5,7 @@
 
 #include <QWheelEvent>
 
-#define BATCH_SIZE 4000
+#define BATCH_SIZE 10000
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 

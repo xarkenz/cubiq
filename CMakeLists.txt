@@ -21,7 +21,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 include_directories(BEFORE src)
-add_executable(cubiq src/core/main.cpp src/core/main_window.cpp src/core/graph_view.cpp src/core/graph.cpp src/equations/function.cpp)
+add_executable(cubiq src/core/main.cpp src/core/main_window.cpp src/core/graph_view.cpp src/core/graph.cpp src/equations/function.cpp src/equations/implicit_equation.cpp src/equations/implicit_equation.h)
 target_link_libraries(cubiq
         Qt5::Core
         Qt5::Gui
