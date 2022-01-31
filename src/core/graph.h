@@ -11,7 +11,7 @@ class Graph {
 public:
 
 
-    GLfloat* getVertices(int*& segIndices, int& numSegs);
+    GLfloat* getVertices(int& numVerts);
     void calculateVertices(float precision);
     BoundingBox getBoundingBox();
     void setBoundingBox(BoundingBox bb);
@@ -25,7 +25,6 @@ private:
     std::vector<Equation*> equationList;
 
     std::vector<GLfloat> vertices;
-    std::vector<int> segmentIndices;
 
     BoundingBox boundingBox;
 

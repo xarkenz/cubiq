@@ -5,7 +5,7 @@
 
 #include <QWheelEvent>
 
-#define BATCH_SIZE 10000
+#define BATCH_SIZE 5000
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
@@ -155,47 +155,28 @@ void GraphView::drawGrid() {
 
 
 void GraphView::drawElements() {
+    bufferIndex = 0; // "Clear" the buffer
 
     float precision = 3 * graph->getBoundingBox().width() / screenW;
 
     graph->calculateVertices(precision); // To be moved to another thread
 
-    int* segmentIndices; // See Graph::getVertices() for more information
-    int numSegs;
-    GLfloat* vertices = graph->getVertices(segmentIndices, numSegs);
-
-    glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, segmentIndices[numSegs-1]*VERTEX_BYTES, vertices);
+    int numVerts, count;
+    GLfloat* vertices = graph->getVertices(numVerts);
 
     glLineWidth(2.5f);
 
-    int count, lastIndex = 0;
-    for (int i = 0; i < numSegs; i++) {
-        count = segmentIndices[i]-lastIndex;
-        lastIndex = segmentIndices[i];
-        glDrawArrays(GL_LINE_STRIP, bufferIndex, count);
-        bufferIndex += count;
+    const int batchSize = BATCH_SIZE - (BATCH_SIZE%2);
+
+    while (numVerts > 0) {
+        count = std::fminf(batchSize,numVerts);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, vertices);
+
+        glDrawArrays(GL_LINES, 0, count);
+        vertices += 7 * count;
+        numVerts -= count;
     }
 
-
-    /*
-    auto graphFunc = [](float x) -> float {
-        return 4.0f * sinf(2.0f * x) + 2.5f * cosf(1.3f * x);
-    };
-
-    GLint first = bufferIndex;
-    float spacing = 3 * (graphR - graphL) / screenW;
-
-    for (float x = std::floor(graphL); x <= std::ceil(graphR) + spacing; x += spacing) {
-        GLfloat vertex[] = {
-                x, graphFunc(x), 0, 0.8f, 0.2f, 0.1f, 1
-        };
-        glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, VERTEX_BYTES, vertex);
-        ++bufferIndex;
-    }
-
-    glLineWidth(2.5f);
-    glDrawArrays(GL_LINE_STRIP, first, bufferIndex - first);
-    */
 }
 
 

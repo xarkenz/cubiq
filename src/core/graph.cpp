@@ -1,6 +1,6 @@
 #include "graph.h"
 
-Graph::Graph(BoundingBox bb) : boundingBox(bb), vertices(), segmentIndices(), equationList() {}
+Graph::Graph(BoundingBox bb) : boundingBox(bb), vertices(), equationList() {}
 
 Graph::Graph() : Graph(BoundingBox{-10,10,-10,10}) {}
 
@@ -15,34 +15,21 @@ void Graph::setBoundingBox(BoundingBox bb) {
 
 // segIndices is a list of vertex indices representing where each segment ends
 // The last element will be the total number of vertices
-GLfloat* Graph::getVertices(int*& segIndices, int& numSegs) {
-    segIndices = &segmentIndices[0];
-    numSegs = segmentIndices.size();
+GLfloat* Graph::getVertices(int& numVerts) {
+    numVerts = vertices.size()/7;
     return &vertices[0];
 }
 
 
 void Graph::calculateVertices(float precision) {
     vertices.clear();
-    segmentIndices.clear();
 
-    int numSegs, vertCount;
+    int numVerts;
     GLfloat* verts;
-    int* segIndices;
     for (Equation* e : equationList) {
-        verts = e->getVertices(segIndices, numSegs, boundingBox, precision);
-
-        if (numSegs > 0) {
-            vertCount = segIndices[numSegs - 1];
-
-            for (int i = 0; i < numSegs; i++) { segIndices[i] += vertices.size() / 7; }
-
-            vertices.insert(vertices.end(), verts, verts + vertCount * 7);
-            segmentIndices.insert(segmentIndices.end(), segIndices, segIndices + numSegs);
-        }
-
+        verts = e->getVertices(numVerts, boundingBox, precision);
+        if (numVerts > 0) { vertices.insert(vertices.end(), verts, verts + numVerts * 7); }
         delete verts;
-        delete segIndices;
     }
 }
 

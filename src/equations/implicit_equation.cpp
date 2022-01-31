@@ -9,24 +9,11 @@ float ImplicitEquation::apply(float x, float y) {
     return (*function)(x,y);
 }
 
-void ImplicitEquation::writeVertex(GLfloat* vertices, int vertIndex, float x, float y) {
-    vertices[7*vertIndex] = x;
-    vertices[7*vertIndex+1] = y;
-    vertices[7*vertIndex+2] = 0;
-    vertices[7*vertIndex+3] = displaySettings.r;
-    vertices[7*vertIndex+4] = displaySettings.g;
-    vertices[7*vertIndex+5] = displaySettings.b;
-    vertices[7*vertIndex+6] = displaySettings.a;
-}
-
-GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) {
+GLfloat* ImplicitEquation::getVertices(int& numVerts, BoundingBox boundingBox, float precision) {
     int gridWidth = std::ceil(boundingBox.maxX/precision)-std::floor(boundingBox.minX/precision);
     int gridHeight = std::ceil(boundingBox.maxY/precision)-std::floor(boundingBox.minY/precision);
-    int numVertices = 4 * gridWidth*gridHeight; // At most 4 vertices per cell
-    GLfloat* vertices = new GLfloat[7 * numVertices];
-
-    segIndices = new int[numVertices/2]; // 1 segment per 2 vertices
-    numSegs = 0;
+    numVerts = 4 * gridWidth*gridHeight; // At most 4 vertices per cell
+    GLfloat* vertices = new GLfloat[7 * numVerts];
 
     // Calculate values
     float values[gridHeight+1][gridWidth+1];
@@ -68,12 +55,10 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
             if (bl == 0 and br == 0) {
                 writeVertex(vertices, vertIndex++, l, b);
                 writeVertex(vertices, vertIndex++, r, b);
-                segIndices[numSegs++] = vertIndex;
             }
             if (tl == 0 and bl == 0) {
                 writeVertex(vertices, vertIndex++, l, t);
                 writeVertex(vertices, vertIndex++, l, b);
-                segIndices[numSegs++] = vertIndex;
             }
 
 
@@ -103,50 +88,42 @@ GLfloat* ImplicitEquation::getVertices(int*& segIndices, int& numSegs, BoundingB
             if (v1 and v2 and not v3 and not v4) {
                 writeVertex(vertices, vertIndex++, v1x, v1y);
                 writeVertex(vertices, vertIndex++, v2x, v2y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v1 and v3 and not v2 and not v4) {
                 writeVertex(vertices, vertIndex++, v1x, v1y);
                 writeVertex(vertices, vertIndex++, v3x, v3y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v1 and v4 and not v2 and not v3) {
                 writeVertex(vertices, vertIndex++, v1x, v1y);
                 writeVertex(vertices, vertIndex++, v4x, v4y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v2 and v3 and not v1 and not v4) {
                 writeVertex(vertices, vertIndex++, v2x, v2y);
                 writeVertex(vertices, vertIndex++, v3x, v3y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v2 and v4 and not v1 and not v3) {
                 writeVertex(vertices, vertIndex++, v2x, v2y);
                 writeVertex(vertices, vertIndex++, v4x, v4y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v3 and v4 and not v1 and not v2) {
                 writeVertex(vertices, vertIndex++, v3x, v3y);
                 writeVertex(vertices, vertIndex++, v4x, v4y);
-                segIndices[numSegs++] = vertIndex;
             } else if (v1 and v2 and v3 and v4) {
                 c = apply((l+r)/2,(b+t)/2);
                 if (c * tl >= 0) {
                     writeVertex(vertices, vertIndex++, v1x, v1y);
                     writeVertex(vertices, vertIndex++, v4x, v4y);
-                    segIndices[numSegs++] = vertIndex;
 
                     writeVertex(vertices, vertIndex++, v2x, v2y);
                     writeVertex(vertices, vertIndex++, v3x, v3y);
-                    segIndices[numSegs++] = vertIndex;
                 } else {
                     writeVertex(vertices, vertIndex++, v1x, v1y);
                     writeVertex(vertices, vertIndex++, v3x, v3y);
-                    segIndices[numSegs++] = vertIndex;
 
                     writeVertex(vertices, vertIndex++, v2x, v2y);
                     writeVertex(vertices, vertIndex++, v4x, v4y);
-                    segIndices[numSegs++] = vertIndex;
                 }
             }
 
         }
     }
+
+    numVerts = vertIndex;
 
     return vertices;
 }

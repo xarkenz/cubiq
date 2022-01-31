@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include "function.h"
+#include <iostream>
 
 Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, float (*func)(float)) : Equation(settings) {
     inputVar = inVar;
@@ -12,51 +13,33 @@ float Function::apply(float input) {
 }
 
 
-GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox boundingBox, float precision) {
+GLfloat* Function::getVertices(int& numVerts, BoundingBox boundingBox, float precision) {
 
     float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
     switch(inputVar) {
         case Function::IndependentVariable::X:
-            inMin = std::floor(boundingBox.minX/precision);
-            inMax = std::ceil(boundingBox.maxX/precision);
-            outMin = std::floor(boundingBox.minY/precision);
-            outMax = std::ceil(boundingBox.maxY/precision);
+            inMin = std::floor(boundingBox.minX/precision)*precision;
+            inMax = std::ceil(boundingBox.maxX/precision)*precision;
+            outMin = std::floor(boundingBox.minY/precision)*precision;
+            outMax = std::ceil(boundingBox.maxY/precision)*precision;
             break;
         case Function::IndependentVariable::Y:
-            inMin = std::floor(boundingBox.minY/precision);
-            inMax = std::ceil(boundingBox.maxY/precision);
-            outMin = std::floor(boundingBox.minX/precision);
-            outMax = std::ceil(boundingBox.maxX/precision);
+            inMin = std::floor(boundingBox.minY/precision)*precision;
+            inMax = std::ceil(boundingBox.maxY/precision)*precision;
+            outMin = std::floor(boundingBox.minX/precision)*precision;
+            outMax = std::ceil(boundingBox.maxX/precision)*precision;
             break;
     }
 
-    int numVertices = inMax - inMin + 1;
-    GLfloat* vertices = new GLfloat[7 * numVertices];
+    int numSegments = (int) ((inMax - inMin)/precision);
+    GLfloat* vertices = new GLfloat[7 * 2*numSegments];
 
-    segIndices = new int[numVertices/2]; // Allocating more space than needed
-    numSegs = 0;
-
-    float in, out, nextOut, x, y;
+    float in, out, x, y, prevX, prevY;
     int vertIndex = 0;
-    bool outOfBounds = false;
-    for (int i = 0; i < numVertices; i++) {
-        in = (inMin + i) * precision;
+    bool inBounds,prevInBounds;
+    for (int i = 0; i < numSegments+1; i++) {
+        in = inMin + i*precision;
         out = apply(in);
-
-        if (out > outMax || out < outMin) {
-            nextOut = apply(in+precision);
-            if (nextOut <= outMax*precision && nextOut >= outMin*precision) {
-                outOfBounds = false;
-            } else {
-                if (outOfBounds) {
-                    continue;
-                }
-                outOfBounds = true;
-                segIndices[numSegs++] = vertIndex + 1;
-            }
-        } else {
-            outOfBounds = false;
-        }
 
         switch(inputVar) {
             case Function::IndependentVariable::X:
@@ -69,16 +52,23 @@ GLfloat* Function::getVertices(int*& segIndices, int& numSegs, BoundingBox bound
                 break;
         }
 
-        vertices[7*vertIndex] = x;
-        vertices[7*vertIndex+1] = y;
-        vertices[7*vertIndex+2] = 0;
-        vertices[7*vertIndex+3] = displaySettings.r;
-        vertices[7*vertIndex+4] = displaySettings.g;
-        vertices[7*vertIndex+5] = displaySettings.b;
-        vertices[7*(vertIndex++)+6] = displaySettings.a;
+        inBounds = out <= outMax && out >= outMin;
+
+        if (i > 0 && (prevInBounds || inBounds)) {
+            writeVertex(vertices, vertIndex++, prevX, prevY);
+            writeVertex(vertices, vertIndex++, x, y);
+        }
+
+        prevX = x;
+        prevY = y;
+        prevInBounds = inBounds;
+
     }
 
-    segIndices[numSegs++] = vertIndex;
+    numVerts = vertIndex;
+    if (vertIndex%2 == 1) {
+        std::cout << "oh no: " << displaySettings.r << ", " << displaySettings.g << ", " <<displaySettings.b << std::endl;
+    }
 
     return vertices;
 }
