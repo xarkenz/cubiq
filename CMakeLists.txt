@@ -14,17 +14,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS
-        Core
-        Gui
-        Widgets
-        REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+
+qt5_add_resources(RESOURCES resources.qrc)
+
+file(GLOB SOURCES src/core/*.cpp src/equations/*.cpp)
 
 include_directories(BEFORE src)
-add_executable(cubiq src/core/main.cpp src/core/main_window.cpp src/core/graph_view.cpp src/core/graph.cpp src/equations/function.cpp src/equations/implicit_equation.cpp src/equations/implicit_equation.h)
-target_link_libraries(cubiq
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        )
-
+add_executable(cubiq ${RESOURCES} ${SOURCES})
+target_link_libraries(cubiq Qt5::Core Qt5::Gui Qt5::Widgets)

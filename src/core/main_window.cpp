@@ -61,6 +61,16 @@ void MainWindow::createGraphView() {
     Equation* eq5 = new ImplicitEquation(ds5, testFunc5);
     graph->addEquation(eq5);
 
+    /*auto disgustingFunc1 = [](float x, float y) -> float {return tan(pow(x, y)) - sin(pow(x, cos(y)));};
+    Equation::DisplaySettings dsg1 {0.8f,0.8f,0.2f,1.0f};
+    Equation* eqg1 = new ImplicitEquation(dsg1, disgustingFunc1);
+    graph->addEquation(eqg1);*/
+
+    /*auto disgustingFunc2 = [](float x, float y) -> float {return tan(x*x + y*y) - 1;};
+    Equation::DisplaySettings dsg2 {0.8f,0.8f,0.2f,1.0f};
+    Equation* eqg2 = new ImplicitEquation(dsg2, disgustingFunc2);
+    graph->addEquation(eqg2);*/
+
 }
 
 

@@ -6,11 +6,10 @@
 
 
 int main(int argc, char* argv[]) {
-    //Q_INIT_RESOURCE(application);
-
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("Cubiq");
     QCoreApplication::setApplicationName("Cubiq Grapher");
+    QApplication::setWindowIcon(QIcon(":/assets/icons/cubiq_bg.svg"));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
