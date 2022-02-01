@@ -16,7 +16,7 @@ float Function::apply(float input) {
 GLfloat* Function::getVertices(int& numVerts, BoundingBox boundingBox, float precision) {
 
     float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
-    switch(inputVar) {
+    switch (inputVar) {
         case Function::IndependentVariable::X:
             inMin = std::floor(boundingBox.minX/precision)*precision;
             inMax = std::ceil(boundingBox.maxX/precision)*precision;

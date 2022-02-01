@@ -203,10 +203,10 @@ void GraphView::wheelEvent(QWheelEvent* event) {
     QPoint angleScroll = event->angleDelta() / 8;
 
     if (!pixelScroll.isNull()) {
-        zoom((float) pixelScroll.y() / 50, event->position()); // TODO: Needs testing with high-resolution scroll
+        zoom((float) pixelScroll.y() / 50, event->pos()); // TODO: Needs testing with high-resolution scroll
     } else if (!angleScroll.isNull()) {
         // Usually 15 degrees per step
-        zoom((float) angleScroll.y() / 15, event->position());
+        zoom((float) angleScroll.y() / 15, event->pos());
     }
 
     event->accept();
