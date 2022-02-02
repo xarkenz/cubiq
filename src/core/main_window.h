@@ -22,8 +22,10 @@ private:
     QDockWidget* equationDock;
     QListWidget* equationList;
 
-    void createGraphView();
+    QAction* createAction(const char* name, const char* text, const char* shortcut);
 
+    void createGraphView();
     void createEquationList();
+    void createTopBar();
 
 };

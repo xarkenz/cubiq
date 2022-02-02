@@ -1,6 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
-    <qresource>
-        <file>assets/icons/cubiq_base.svg</file>
-        <file>assets/icons/cubiq_bg.svg</file>
+    <qresource prefix="/icons">
+        <file alias="cubiq_base">assets/icons/cubiq_base.svg</file>
+        <file alias="cubiq_bg">assets/icons/cubiq_bg.svg</file>
+        <file alias="new">assets/icons/new.svg</file>
+        <file alias="open">assets/icons/open.svg</file>
+        <file alias="save">assets/icons/save.svg</file>
+        <file alias="settings">assets/icons/settings.svg</file>
     </qresource>
 </RCC>

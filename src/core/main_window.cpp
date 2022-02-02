@@ -12,6 +12,7 @@ MainWindow::MainWindow() :
     setMinimumSize(800, 600);
     setWindowTitle("[*]Untitled Graph - Cubiq Grapher");
     setCentralWidget(graphView);
+    createTopBar();
     createGraphView();
     createEquationList();
     setWindowModified(false);
@@ -25,6 +26,15 @@ void MainWindow::onModification() {
 
 void MainWindow::closeEvent(QCloseEvent* event) {
     event->accept();
+}
+
+
+QAction* MainWindow::createAction(const char* name, const char* text, const char* shortcut) {
+    std::string iconFile(":/icons/");
+    iconFile += name;
+    auto* action = new QAction(QIcon(iconFile.c_str()), tr(text), this);
+    action->setShortcut(tr(shortcut));
+    return action;
 }
 
 
@@ -78,4 +88,27 @@ void MainWindow::createEquationList() {
     equationDock->setWidget(equationList);
     equationList->addItem(QString("equations go here"));
     addDockWidget(Qt::LeftDockWidgetArea, equationDock);
+}
+
+
+void MainWindow::createTopBar() {
+    QAction* aNew = createAction("new", "New", "Ctrl+N");
+    QAction* aOpen = createAction("open", "Open...", "Ctrl+O");
+    QAction* aSave = createAction("save", "Save", "Ctrl+S");
+    QAction* aSettings = createAction("settings", "Settings...", "Ctrl+Alt+S");
+
+    QMenu* mFile = menuBar()->addMenu("File");
+    mFile->addAction(aNew);
+    mFile->addAction(aOpen);
+    mFile->addAction(aSave);
+    mFile->addSeparator();
+    mFile->addAction(aSettings);
+
+    QMenu* mEdit = menuBar()->addMenu("Edit");
+
+    QMenu* mView = menuBar()->addMenu("View");
+
+    QMenu* mWindow = menuBar()->addMenu("Window");
+
+    QMenu* mHelp = menuBar()->addMenu("Help");
 }
