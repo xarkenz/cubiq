@@ -2,7 +2,7 @@
 
 #include "equations/equation.h"
 
-class [[deprecated("Use ImplicitEquation instead.")]] Function : public Equation {
+class /*[[deprecated("Use ImplicitEquation instead.")]]*/ Function : public Equation {
 
 public:
 

@@ -18,6 +18,12 @@ MainWindow::MainWindow() :
     setWindowModified(false);
 }
 
+MainWindow::~MainWindow() {
+    delete graphView;
+    delete equationList;
+    delete equationDock;
+}
+
 
 void MainWindow::onModification() {
     setWindowModified(true);

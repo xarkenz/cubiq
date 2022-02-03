@@ -2,7 +2,7 @@
 #include <QCommandLineParser>
 #include <QPushButton>
 
-#include "main_window.h"
+#include "core/main_window.h"
 
 
 int main(int argc, char* argv[]) {

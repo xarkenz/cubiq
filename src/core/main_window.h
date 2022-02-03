@@ -11,6 +11,7 @@ Q_OBJECT
 
 public:
     MainWindow();
+    ~MainWindow();
 
     void onModification();
 

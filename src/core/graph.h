@@ -18,10 +18,13 @@ public:
 
     explicit Graph(BoundingBox bb);
     Graph();
+    ~Graph();
 
     void addEquation(Equation* e);
 
 private:
+    std::mutex mutex;
+
     std::vector<Equation*> equationList;
 
     std::vector<GLfloat> vertices;

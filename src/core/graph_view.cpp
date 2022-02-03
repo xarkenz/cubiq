@@ -5,7 +5,8 @@
 
 #include <QWheelEvent>
 
-#define BATCH_SIZE 5000
+
+const int GraphView::BATCH_SIZE = 5000;
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
@@ -16,7 +17,7 @@ const char* BASIC_FRAGMENT =
 #include "shader/basic_fragment_glsl.h"
 
 
-GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
+GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent), calculationThread(this, g) {
         graph = g;
 
         clearR = .1f;
@@ -29,9 +30,21 @@ GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent) {
         bufferIndex = 0;
 
         dragStartBounds = {0, 0, 0, 0};
+        dragging = false;
 }
 
-void GraphView::setGraph(Graph* g) {graph = g;}
+GraphView::~GraphView() {
+    calculationThread.markToExit();
+    calculationThread.join();
+
+    delete graph;
+}
+
+void GraphView::setGraph(Graph* g) {
+    graph = g;
+    calculationThread.setGraph(g);
+
+}
 Graph* GraphView::getGraph() {return graph;}
 
 
@@ -76,6 +89,8 @@ void GraphView::resizeGL(int w, int h) {
     setMinimumWidth(h / 8);
 
     adjustCamera();
+
+    calculationThread.markToUpdate();
 }
 
 
@@ -157,56 +172,67 @@ void GraphView::drawGrid() {
 void GraphView::drawElements() {
     bufferIndex = 0; // "Clear" the buffer
 
-    float precision = 3 * graph->getBoundingBox().width() / screenW;
-
-    graph->calculateVertices(precision); // To be moved to another thread
-
     int numVerts, count;
     GLfloat* vertices = graph->getVertices(numVerts);
+
+    if (numVerts == 0) { return; }
 
     glLineWidth(2.5f);
 
     const int batchSize = BATCH_SIZE - (BATCH_SIZE%2);
+    GLfloat* ptr = vertices;
 
     while (numVerts > 0) {
         count = std::fminf(batchSize,numVerts);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, ptr);
 
         glDrawArrays(GL_LINES, 0, count);
-        vertices += 7 * count;
+        ptr += 7 * count;
         numVerts -= count;
     }
+
+    delete vertices;
 
 }
 
 
 void GraphView::mousePressEvent(QMouseEvent* event) {
+    dragging = true;
     dragStartPos = event->pos();
     dragStartBounds = graph->getBoundingBox();
 }
 
+void GraphView::mouseReleaseEvent(QMouseEvent* event) {
+    dragging = false;
+}
+
 
 void GraphView::mouseMoveEvent(QMouseEvent* event) {
-    const float aspect = (float) screenH / (float) screenW;
+    if (dragging) {
+        const float aspect = (float) screenH / (float) screenW;
 
-    graph->setBoundingBox(dragStartBounds.moved(
-            dragStartBounds.width() * (float) (dragStartPos.x() - event->x()) / (float) screenW,
-            dragStartBounds.height() * aspect * (float) (event->y() - dragStartPos.y()) / (float) screenH));
+        graph->setBoundingBox(dragStartBounds.moved(
+                dragStartBounds.width() * (float) (dragStartPos.x() - event->x()) / (float) screenW,
+                dragStartBounds.height() * aspect * (float) (event->y() - dragStartPos.y()) / (float) screenH));
 
-    adjustCamera();
-    update();
+        adjustCamera();
+        calculationThread.markToUpdate();
+        update();
+    }
 }
 
 
 void GraphView::wheelEvent(QWheelEvent* event) {
+    if (dragging) {return;}
+
     QPoint pixelScroll = event->pixelDelta();
     QPoint angleScroll = event->angleDelta() / 8;
 
     if (!pixelScroll.isNull()) {
-        zoom((float) pixelScroll.y() / 50, event->pos()); // TODO: Needs testing with high-resolution scroll
+        zoom((float) pixelScroll.y() / 50, event->position()); // TODO: Needs testing with high-resolution scroll
     } else if (!angleScroll.isNull()) {
         // Usually 15 degrees per step
-        zoom((float) angleScroll.y() / 15, event->pos());
+        zoom((float) angleScroll.y() / 15, event->position());
     }
 
     event->accept();
@@ -232,6 +258,7 @@ void GraphView::zoom(float steps, QPointF pos) {
     graph->setBoundingBox(newBounds);
 
     adjustCamera();
+    calculationThread.markToUpdate();
     update();
 }
 
@@ -317,3 +344,27 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
 
     return program;
 }
+
+
+const int GraphView::CalculationThread::MILLIS_PER_UPDATE = 17;
+
+GraphView::CalculationThread::CalculationThread(GraphView* p, Graph* g) : std::thread(&GraphView::CalculationThread::run, this), parent(p), graph(g), toUpdate(false), toExit(false) {}
+
+void GraphView::CalculationThread::run() {
+    float precision;
+    std::defer_lock_t t;
+    while (!toExit) {
+        if (toUpdate) {
+            precision = 3 * graph->getBoundingBox().width() / parent->screenW;
+            graph->calculateVertices(precision);
+            parent->update();
+            toUpdate = false;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(MILLIS_PER_UPDATE));
+    }
+}
+
+void GraphView::CalculationThread::markToUpdate() {toUpdate = true;}
+void GraphView::CalculationThread::markToExit() {toExit = true;}
+
+void GraphView::CalculationThread::setGraph(Graph* g) { graph = g; }
