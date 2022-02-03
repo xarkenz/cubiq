@@ -1,7 +1,7 @@
 <svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="#72e02d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <g stroke="#ff9421" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
         <path stroke-width="4" d="M 32 32 m -22 -30 a 8 8 0 0 0 -8 8 l 0 44 a 8 8 0 0 0 8 8 l 44 0 a 8 8 0 0 0 8 -8 l 0 -44 a 8 8 0 0 0 -8 -8 z"/>
-        <path d="M 32 32 m 0 -16 l 0 32"/>
-        <path d="M 32 32 m -16 0 l 32 0"/>
+        <path d="M 32 32 m -20 -8 l 0 28 l 28 0 l 0 -28 z"/>
+        <path d="M 32 32 m -8 -20 l 28 0 l 0 28"/>
     </g>
 </svg>

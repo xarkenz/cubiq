@@ -95,16 +95,23 @@ void MainWindow::createTopBar() {
     QAction* aNew = createAction("new", "New", "Ctrl+N");
     QAction* aOpen = createAction("open", "Open...", "Ctrl+O");
     QAction* aSave = createAction("save", "Save", "Ctrl+S");
+    QAction* aSaveAs = createAction("saveas", "Save as...", "Ctrl+Shift+S");
     QAction* aSettings = createAction("settings", "Settings...", "Ctrl+Alt+S");
+
+    QAction* aCopy = createAction("copy", "Copy", "Ctrl+C");
+    QAction* aCut = createAction("cut", "Cut", "Ctrl+X");
 
     QMenu* mFile = menuBar()->addMenu("File");
     mFile->addAction(aNew);
     mFile->addAction(aOpen);
     mFile->addAction(aSave);
+    mFile->addAction(aSaveAs);
     mFile->addSeparator();
     mFile->addAction(aSettings);
 
     QMenu* mEdit = menuBar()->addMenu("Edit");
+    mEdit->addAction(aCopy);
+    mEdit->addAction(aCut);
 
     QMenu* mView = menuBar()->addMenu("View");
 

@@ -1,11 +1,7 @@
 <svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="none" fill="#72e02d">
-        <path d="M 32 32 m -24 -32 a 8 8 0 0 0 -8 8 l 0 48 a 8 8 0 0 0 8 8 l 48 0 a 8 8 0 0 0 8 -8 l 0 -48 a 8 8 0 0 0 -8 -8 z"/>
-    </g>
-    <g stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
-        <path d="M 32 32 m 0 -20 l 0 40"/>
-        <path d="M 32 32 m -20 20 l 40 0"/>
-        <path d="M 32 32 m 0 -20 l -12 12"/>
-        <path d="M 32 32 m 0 -20 l 12 12"/>
+    <g stroke="#72e02d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path stroke-width="4" d="M 32 32 m -30 -30 l 0 52 a 8 8 0 0 0 8 8 l 44 0 a 8 8 0 0 0 8 -8 l 0 -36 a 8 8 0 0 0 -8 -8 l -28 0 l 0 -8 z"/>
+        <path d="M 32 32 m 0 0 l 0 16"/>
+        <path stroke-width="4" fill="#72e02d" d="M 32 32 m -12 2 l 12 -12 l 12 12 z"/>
     </g>
 </svg>
