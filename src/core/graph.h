@@ -12,7 +12,7 @@ class Graph {
 public:
 
 
-    GLfloat* getVertices(int& numVerts);
+    GLfloat* getVertices(unsigned long& numVerts);
     void calculateVertices(float precision);
     BoundingBox getBoundingBox();
     void setBoundingBox(BoundingBox bb);

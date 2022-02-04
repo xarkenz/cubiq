@@ -1,4 +1,6 @@
 #include <cmath>
+#include <omp.h>
+#include <iostream>
 #include "implicit_equation.h"
 
 ImplicitEquation::ImplicitEquation(DisplaySettings settings, float (*func)(float,float)) : Equation(settings) {
@@ -9,31 +11,39 @@ float ImplicitEquation::apply(float x, float y) {
     return (*function)(x,y);
 }
 
-GLfloat* ImplicitEquation::getVertices(int& numVerts, BoundingBox boundingBox, float precision) {
+GLfloat* ImplicitEquation::getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) {
     int gridWidth = std::ceil(boundingBox.maxX/precision)-std::floor(boundingBox.minX/precision);
     int gridHeight = std::ceil(boundingBox.maxY/precision)-std::floor(boundingBox.minY/precision);
     numVerts = 4 * gridWidth*gridHeight; // At most 4 vertices per cell
     GLfloat* vertices = new GLfloat[7 * numVerts];
 
     // Calculate values
-    float values[gridHeight+1][gridWidth+1];
+    float** values = new float*[gridHeight+1];
+
     float x,y;
-    for (int xInd = 0; xInd<gridWidth+1; xInd++) {
-        x = (std::floor(boundingBox.minX/precision) + xInd)*precision;
-        for (int yInd = 0; yInd<gridHeight+1; yInd++) {
-            y = (std::floor(boundingBox.minY/precision) + yInd)*precision;
+
+    #pragma omp parallel for num_threads(NUM_THREADS) shared(gridHeight,gridWidth,values,precision,boundingBox) private(x,y) default(none)
+    for (int yInd = 0; yInd<gridHeight+1; yInd++) {
+        values[yInd] = new float[gridWidth+1];
+
+        y = (std::floor(boundingBox.minY/precision) + (float)yInd)*precision;
+        for (int xInd = 0; xInd<gridWidth+1; xInd++) {
+            x = (std::floor(boundingBox.minX/precision) + (float)xInd)*precision;
             values[yInd][xInd] = apply(x,y);
         }
     }
 
     // Create vertices
-    int vertIndex = 0;
+    int vertIndex;
     float tl,tr,bl,br;
     float l,r,b,t,c;
     float v1x,v1y,v2x,v2y,v3x,v3y,v4x,v4y;
     bool v1,v2,v3,v4;
+    #pragma omp parallel for num_threads(NUM_THREADS) collapse(2) shared(vertices,gridHeight,gridWidth,values,precision,boundingBox) private(vertIndex,tl,tr,bl,br,l,r,b,t,c,v1x,v1y,v2x,v2y,v3x,v3y,v4x,v4y,v1,v2,v3,v4) default(none)
     for (int x = 0; x < gridWidth; x++) {
         for (int y = 0; y < gridHeight; y++) {
+
+            vertIndex = (y * gridWidth + x) * 4;
 
             tl = values[y+1][x];
             tr = values[y+1][x+1];
@@ -123,7 +133,10 @@ GLfloat* ImplicitEquation::getVertices(int& numVerts, BoundingBox boundingBox, f
         }
     }
 
-    numVerts = vertIndex;
+    for (int y = 0; y<gridHeight+1; y++) {
+        delete[] values[y];
+    }
+    delete[] values;
 
     return vertices;
 }

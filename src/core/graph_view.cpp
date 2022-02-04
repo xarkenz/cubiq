@@ -172,7 +172,8 @@ void GraphView::drawGrid() {
 void GraphView::drawElements() {
     bufferIndex = 0; // "Clear" the buffer
 
-    int numVerts, count;
+    unsigned long numVerts;
+    unsigned int count;
     GLfloat* vertices = graph->getVertices(numVerts);
 
     if (numVerts == 0) { return; }
@@ -183,7 +184,7 @@ void GraphView::drawElements() {
     GLfloat* ptr = vertices;
 
     while (numVerts > 0) {
-        count = std::fminf(batchSize,numVerts);
+        count = (int) std::fminl(batchSize,numVerts);
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, ptr);
 
         glDrawArrays(GL_LINES, 0, count);
@@ -191,7 +192,7 @@ void GraphView::drawElements() {
         numVerts -= count;
     }
 
-    delete vertices;
+    delete[] vertices;
 
 }
 

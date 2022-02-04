@@ -3,9 +3,9 @@
 #include <QOpenGLBuffer>
 #include "core/bounding_box.h"
 
-class Equation {
+#define NUM_THREADS 4 // Number of threads to use for parallel computing
 
-    // TODO: add color
+class Equation {
 
 public:
 
@@ -17,7 +17,7 @@ public:
     explicit Equation(DisplaySettings settings) {displaySettings = settings;}
     virtual ~Equation(){};
 
-    virtual GLfloat* getVertices(int& numVerts, BoundingBox boundingBox, float precision) = 0;
+    virtual GLfloat* getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) = 0;
 
 protected:
     DisplaySettings displaySettings{};

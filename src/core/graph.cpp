@@ -1,5 +1,8 @@
 #include <cstring>
+#include <omp.h>
 #include "graph.h"
+
+#define NUM_THREADS 4 // Number of threads to use for parallel computing
 
 Graph::Graph(BoundingBox bb) : boundingBox(bb), vertices(), equationList() {}
 
@@ -24,7 +27,7 @@ void Graph::setBoundingBox(BoundingBox bb) {
 
 // segIndices is a list of vertex indices representing where each segment ends
 // The last element will be the total number of vertices
-GLfloat* Graph::getVertices(int& numVerts) {
+GLfloat* Graph::getVertices(unsigned long& numVerts) {
     std::scoped_lock<std::mutex> lock(mutex);
 
     numVerts = vertices.size()/7;
@@ -46,13 +49,21 @@ void Graph::calculateVertices(float precision) {
 
     vertices.clear();
 
-    int numVerts;
-    GLfloat* verts;
-    for (Equation* e : equationList) {
-        verts = e->getVertices(numVerts, boundingBox, precision);
-        if (numVerts > 0) { vertices.insert(vertices.end(), verts, verts + numVerts * 7); }
-        delete verts;
+    GLfloat** verts = new GLfloat*[equationList.size()];
+    unsigned long* numVerts = new unsigned long[equationList.size()];
+
+    #pragma omp parallel for num_threads(NUM_THREADS) shared(verts,numVerts,precision) default(none)
+    for (int i = 0; i < equationList.size(); i++) {
+        verts[i] = equationList.at(i)->getVertices(numVerts[i], boundingBox, precision);
     }
+
+    for (int i = 0; i < equationList.size(); i++) {
+        if (numVerts[i] > 0) { vertices.insert(vertices.end(), verts[i], verts[i] + numVerts[i] * 7); }
+        delete[] verts[i];
+    }
+
+    delete[] verts;
+    delete[] numVerts;
 }
 
 void Graph::addEquation(Equation* e) {

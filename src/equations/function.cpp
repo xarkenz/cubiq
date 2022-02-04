@@ -13,7 +13,7 @@ float Function::apply(float input) {
 }
 
 
-GLfloat* Function::getVertices(int& numVerts, BoundingBox boundingBox, float precision) {
+GLfloat* Function::getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) {
 
     float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
     switch (inputVar) {

@@ -10,7 +10,7 @@ public:
 
     Function(DisplaySettings settings, IndependentVariable inVar, float (*func)(float));
 
-    GLfloat* getVertices(int& numVerts, BoundingBox boundingBox, float precision) override;
+    GLfloat* getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) override;
 
     float apply(float input);
 
