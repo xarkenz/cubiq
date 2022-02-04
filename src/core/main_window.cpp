@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <iostream>
 
 #include "main_window.h"
 #include "../equations/function.h"
@@ -35,11 +36,13 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 }
 
 
-QAction* MainWindow::createAction(const char* name, const char* text, const char* shortcut) {
+QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* whatsThis) {
     std::string iconFile(":/icons/");
     iconFile += name;
     auto* action = new QAction(QIcon(iconFile.c_str()), tr(text), this);
     action->setShortcut(tr(shortcut));
+    action->setWhatsThis(whatsThis);
+    connect(action, SIGNAL(triggered()), this, slot);
     return action;
 }
 
@@ -98,14 +101,14 @@ void MainWindow::createEquationList() {
 
 
 void MainWindow::createTopBar() {
-    QAction* aNew = createAction("new", "New", "Ctrl+N");
-    QAction* aOpen = createAction("open", "Open...", "Ctrl+O");
-    QAction* aSave = createAction("save", "Save", "Ctrl+S");
-    QAction* aSaveAs = createAction("saveas", "Save as...", "Ctrl+Shift+S");
-    QAction* aSettings = createAction("settings", "Settings...", "Ctrl+Alt+S");
+    QAction* aNew = createAction("new", "New", SLOT(handleNew()), "Ctrl+N", "Create a new graph.");
+    QAction* aOpen = createAction("open", "Open...", SLOT(handleOpen()), "Ctrl+O", "Open a graph from file.");
+    QAction* aSave = createAction("save", "Save", SLOT(handleSave()), "Ctrl+S", "Save the current graph.");
+    QAction* aSaveAs = createAction("saveas", "Save as...", SLOT(handleSaveAs()), "Ctrl+Shift+S", "Save the graph under a new name.");
+    QAction* aSettings = createAction("settings", "Settings...", SLOT(handleSettings()), "Ctrl+Alt+S", "Configure the look and feel of Cubiq.");
 
-    QAction* aCopy = createAction("copy", "Copy", "Ctrl+C");
-    QAction* aCut = createAction("cut", "Cut", "Ctrl+X");
+    QAction* aCopy = createAction("copy", "Copy", SLOT(handleCopy()), "Ctrl+C", "Copy the current selection to clipboard.");
+    QAction* aCut = createAction("cut", "Cut", SLOT(handleCut()), "Ctrl+X", "Cut the current selection to clipboard.");
 
     QMenu* mFile = menuBar()->addMenu("File");
     mFile->addAction(aNew);
@@ -124,4 +127,33 @@ void MainWindow::createTopBar() {
     QMenu* mWindow = menuBar()->addMenu("Window");
 
     QMenu* mHelp = menuBar()->addMenu("Help");
+}
+
+
+void MainWindow::handleNew() {
+    std::cout << "new" << std::endl;
+}
+
+void MainWindow::handleOpen() {
+    std::cout << "open" << std::endl;
+}
+
+void MainWindow::handleSave() {
+    std::cout << "save" << std::endl;
+}
+
+void MainWindow::handleSaveAs() {
+    std::cout << "save as" << std::endl;
+}
+
+void MainWindow::handleSettings() {
+    std::cout << "settings" << std::endl;
+}
+
+void MainWindow::handleCopy() {
+    std::cout << "copy" << std::endl;
+}
+
+void MainWindow::handleCut() {
+    std::cout << "cut" << std::endl;
 }

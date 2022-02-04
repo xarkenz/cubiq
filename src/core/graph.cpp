@@ -1,3 +1,4 @@
+#include <cstring>
 #include "graph.h"
 
 Graph::Graph(BoundingBox bb) : boundingBox(bb), vertices(), equationList() {}

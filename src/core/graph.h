@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <mutex>
 #include <QOpenGLBuffer>
 #include "equations/equation.h"
 #include "core/bounding_box.h"

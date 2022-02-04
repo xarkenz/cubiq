@@ -14,6 +14,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # Needed for threading on some systems
+
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 qt5_add_resources(RESOURCES resources.qrc)
