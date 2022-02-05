@@ -13,8 +13,6 @@ public:
     MainWindow();
     ~MainWindow();
 
-    void onModification();
-
 protected:
     void closeEvent(QCloseEvent* event) override;
 
@@ -32,8 +30,8 @@ private:
 public slots:
     void handleNew();
     void handleOpen();
-    void handleSave();
-    void handleSaveAs();
+    bool handleSave();
+    bool handleSaveAs();
     void handleSettings();
 
     void handleCopy();

@@ -40,12 +40,19 @@ GraphView::~GraphView() {
     delete graph;
 }
 
+
 void GraphView::setGraph(Graph* g) {
+    delete graph;
     graph = g;
     calculationThread.setGraph(g);
 
+    adjustCamera();
+    update();
 }
-Graph* GraphView::getGraph() {return graph;}
+
+Graph* GraphView::getGraph() {
+    return graph;
+}
 
 
 void GraphView::initializeGL() {

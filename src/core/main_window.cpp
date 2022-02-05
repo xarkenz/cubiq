@@ -11,23 +11,18 @@ MainWindow::MainWindow() :
         equationDock(new QDockWidget(tr("equations"), this)),
         equationList(new QListWidget(equationDock)) {
     setMinimumSize(800, 600);
-    setWindowTitle("[*]Untitled Graph - Cubiq Grapher");
+    setWindowTitle("[*] Untitled Graph - Cubiq Grapher");
     setCentralWidget(graphView);
+    setWindowModified(false);
     createTopBar();
     createGraphView();
     createEquationList();
-    setWindowModified(false);
 }
 
 MainWindow::~MainWindow() {
     delete graphView;
     delete equationList;
     delete equationDock;
-}
-
-
-void MainWindow::onModification() {
-    setWindowModified(true);
 }
 
 
@@ -90,6 +85,7 @@ void MainWindow::createGraphView() {
     Equation* eqg2 = new ImplicitEquation(dsg2, disgustingFunc2);
     graph->addEquation(eqg2);*/
 
+    setWindowModified(true);
 }
 
 
@@ -131,29 +127,53 @@ void MainWindow::createTopBar() {
 
 
 void MainWindow::handleNew() {
-    std::cout << "new" << std::endl;
+    if (isWindowModified()) {
+        QMessageBox dialog;
+        dialog.setIcon(QMessageBox::Question);
+        dialog.setText("This graph has unsaved changes.");
+        dialog.setInformativeText("Would you like to save them?");
+        dialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        dialog.setDefaultButton(QMessageBox::Save);
+        int option = dialog.exec();
+
+        switch (option) {
+            case QMessageBox::Save: {
+                bool saved = handleSave();
+                if (!saved) break; // Does not run at the moment; save logic not implemented
+            }
+            case QMessageBox::Discard:
+                graphView->setGraph(new Graph());
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void MainWindow::handleOpen() {
-    std::cout << "open" << std::endl;
+    // Open file
 }
 
-void MainWindow::handleSave() {
-    std::cout << "save" << std::endl;
+bool MainWindow::handleSave() {
+    // Handle saving: true if saved successfully, false if cancelled (i.e. exited Save As)
+    setWindowModified(false);
+    return true;
 }
 
-void MainWindow::handleSaveAs() {
-    std::cout << "save as" << std::endl;
+bool MainWindow::handleSaveAs() {
+    // Open file dialog to save under a filename, true if saved, false if cancelled
+    setWindowModified(false);
+    return true;
 }
 
 void MainWindow::handleSettings() {
-    std::cout << "settings" << std::endl;
+    // Open settings dialog
 }
 
 void MainWindow::handleCopy() {
-    std::cout << "copy" << std::endl;
+    // Copy
 }
 
 void MainWindow::handleCut() {
-    std::cout << "cut" << std::endl;
+    // Cut
 }

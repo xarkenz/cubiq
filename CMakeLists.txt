@@ -22,8 +22,15 @@ if(APPLE)
 
 elseif(UNIX)
 	set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu")
+
+	#set(CMAKE_C_COMPILER gcc)
+	#set(CMAKE_CXX_COMPILER g++)
+	#set(OPENMP_LIBRARIES "/usr/lib/x86_64-linux-gnu")
+	#set(OPENMP_INCLUDES "/usr/lib/x86_64-linux-gnu")
+
 elseif (WIN32)
 	set(CMAKE_PREFIX_PATH "C:/Qt/Qt-5.12.12")
+
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -36,10 +43,10 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")	 # Needed for 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(OpenMP REQUIRED)
 
-if (OPENMP_FOUND)
-	include_directories("${OPENMP_INCLUDES}")
-	link_directories("${OPENMP_LIBRARIES}")
-endif(OPENMP_FOUND)
+#if (OPENMP_FOUND)
+#	include_directories("${OPENMP_INCLUDES}")
+#	link_directories("${OPENMP_LIBRARIES}")
+#endif(OPENMP_FOUND)
 
 qt5_add_resources(RESOURCES resources.qrc)
 
