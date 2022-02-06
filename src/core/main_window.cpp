@@ -60,27 +60,27 @@ void MainWindow::createGraphView() {
     Equation* eq2 = new Function(ds2, Function::IndependentVariable::Y, testFunc2);
     graph->addEquation(eq2);
 
-    auto testFunc3 = [](float x) -> float {return tanf(x);};
+    /*auto testFunc3 = [](float x) -> float {return tanf(x);};
     Equation::DisplaySettings ds3 {0.2f,0.8f,0.2f,1.0f};
     Equation* eq3 = new Function(ds3, Function::IndependentVariable::X, testFunc3);
-    graph->addEquation(eq3);
+    graph->addEquation(eq3);*/
 
-    auto testFunc4 = [](float x, float y) -> float {return x*x/4 + y*y/2 + (x+2)*y/3 - 5;};
+    /*auto testFunc4 = [](float x, float y) -> float {return x*x/4 + y*y/2 + (x+2)*y/3 - 5;};
     Equation::DisplaySettings ds4 {0.8f,0.8f,0.2f,1.0f};
     Equation* eq4 = new ImplicitEquation(ds4, testFunc4);
-    graph->addEquation(eq4);
+    graph->addEquation(eq4);*/
 
-    auto testFunc5 = [](float x, float y) -> float {return x*y;};
+    /*auto testFunc5 = [](float x, float y) -> float {return x*y;};
     Equation::DisplaySettings ds5 {0.8f,0.2f,0.8f,1.0f};
     Equation* eq5 = new ImplicitEquation(ds5, testFunc5);
-    graph->addEquation(eq5);
+    graph->addEquation(eq5);*/
 
     /*auto disgustingFunc1 = [](float x, float y) -> float {return tan(pow(x, y)) - sin(pow(x, cos(y)));};
     Equation::DisplaySettings dsg1 {0.8f,0.8f,0.2f,1.0f};
     Equation* eqg1 = new ImplicitEquation(dsg1, disgustingFunc1);
-    graph->addEquation(eqg1);
+    graph->addEquation(eqg1);*/
 
-    auto disgustingFunc2 = [](float x, float y) -> float {return tan(x*x + y*y) - 1;};
+    /*auto disgustingFunc2 = [](float x, float y) -> float {return tan(x*x + y*y) - 1;};
     Equation::DisplaySettings dsg2 {0.8f,0.8f,0.2f,1.0f};
     Equation* eqg2 = new ImplicitEquation(dsg2, disgustingFunc2);
     graph->addEquation(eqg2);*/

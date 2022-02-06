@@ -61,7 +61,7 @@ void GraphView::initializeGL() {
     // Configure rendering
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Configure screen clear color
     glClearColor(clearR, clearG, clearB, 1);
@@ -138,22 +138,35 @@ void GraphView::drawGrid() {
     const float aspect = (float) screenH / screenW;
     GLint first = bufferIndex;
 
-    for (float x = std::floor(graph->getBoundingBox().minX); x <= std::ceil(graph->getBoundingBox().maxX); x += 1) {
+    const float c1 = 0.3f;
+    const float c2 = 0.6f;
+    const float c3 = 0.8f;
+
+    const float spaceX = 1;
+    const float spaceY = 1;
+
+    for (float x = std::floor(graph->getBoundingBox().minX / spaceX) * spaceX;
+            x <= std::ceil(graph->getBoundingBox().maxX / spaceX) * spaceX;
+            x += spaceX) {
         if (x != 0) {
+            float c = (int) (x / spaceX) % 4 == 0 ? c2 : c1;
             GLfloat line[] = {
-                    x, graph->getBoundingBox().centerY()+ graph->getBoundingBox().height() * aspect, 0, 0.3f, 0.3f, 0.3f, 1,
-                    x, graph->getBoundingBox().centerY()- graph->getBoundingBox().height() * aspect, 0, 0.3f, 0.3f, 0.3f, 1
+                    x, graph->getBoundingBox().centerY()+ graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c,
+                    x, graph->getBoundingBox().centerY()- graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c,
             };
             glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
             bufferIndex += 2;
         }
     }
 
-    for (float y = std::floor(graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect); y <= std::ceil(graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect); y += 1) {
+    for (float y = std::floor((graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect) / spaceY) * spaceY;
+            y <= std::ceil((graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect) / spaceY) * spaceY;
+            y += spaceY) {
         if (y != 0) {
+            float c = (int) (y / spaceY) % 4 == 0 ? c2 : c1;
             GLfloat line[] = {
-                    graph->getBoundingBox().minX, y, 0, 0.3f, 0.3f, 0.3f, 1,
-                    graph->getBoundingBox().maxX, y, 0, 0.3f, 0.3f, 0.3f, 1
+                    graph->getBoundingBox().minX, y, 0, 1, 1, 1, c,
+                    graph->getBoundingBox().maxX, y, 0, 1, 1, 1, c,
             };
             glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
             bufferIndex += 2;
@@ -164,10 +177,10 @@ void GraphView::drawGrid() {
     glDrawArrays(GL_LINES, first, bufferIndex - first);
 
     GLfloat axes[] = {
-            0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
-            0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 0.6f, 0.6f, 0.6f, 1,
-            graph->getBoundingBox().minX, 0, 0, 0.6f, 0.6f, 0.6f, 1,
-            graph->getBoundingBox().maxX, 0, 0, 0.6f, 0.6f, 0.6f, 1,
+            0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c3,
+            0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c3,
+            graph->getBoundingBox().minX, 0, 0, 1, 1, 1, c3,
+            graph->getBoundingBox().maxX, 0, 0, 1, 1, 1, c3,
     };
     glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 4 * VERTEX_BYTES, axes);
     glLineWidth(2);
