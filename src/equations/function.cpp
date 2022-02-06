@@ -8,37 +8,55 @@ Function::Function(DisplaySettings settings, Function::IndependentVariable inVar
     function = func;
 }
 
-float Function::apply(float input) {
+float Function::apply(float input) const {
     return (*function)(input);
 }
 
 
-GLfloat* Function::getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) {
-
-    float inMin = 0, inMax = 0, outMin = 0, outMax = 0;
+unsigned long Function::getNumVertices(BoundingBox boundingBox, double precision) const {
+    double inMin = 0, inMax = 0;
     switch (inputVar) {
         case Function::IndependentVariable::X:
             inMin = std::floor(boundingBox.minX/precision)*precision;
             inMax = std::ceil(boundingBox.maxX/precision)*precision;
+            break;
+        case Function::IndependentVariable::Y:
+            inMin = std::floor(boundingBox.minY/precision)*precision;
+            inMax = std::ceil(boundingBox.maxY/precision)*precision;
+            break;
+    }
+
+    if (inMax <= inMin) {return 0;}
+    return 2*(unsigned long)((inMax - inMin)/precision);
+}
+
+void Function::writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const {
+
+    unsigned long numVerts = getNumVertices(boundingBox,precision);
+
+    if (numVerts == 0) {return;}
+
+    double inMin = 0, outMin = 0, outMax = 0;
+    switch (inputVar) {
+        case Function::IndependentVariable::X:
+            inMin = std::floor(boundingBox.minX/precision)*precision;
             outMin = std::floor(boundingBox.minY/precision)*precision;
             outMax = std::ceil(boundingBox.maxY/precision)*precision;
             break;
         case Function::IndependentVariable::Y:
             inMin = std::floor(boundingBox.minY/precision)*precision;
-            inMax = std::ceil(boundingBox.maxY/precision)*precision;
             outMin = std::floor(boundingBox.minX/precision)*precision;
             outMax = std::ceil(boundingBox.maxX/precision)*precision;
             break;
     }
 
-    int numSegments = (int) ((inMax - inMin)/precision);
-    GLfloat* vertices = new GLfloat[7 * 2*numSegments];
+    unsigned long numSegments = numVerts/2;
 
     float in, out, x, y, prevX, prevY;
     int vertIndex = 0;
     bool inBounds,prevInBounds;
-    for (int i = 0; i < numSegments+1; i++) {
-        in = inMin + i*precision;
+    for (long i = 0; i < numSegments+1; i++) {
+        in = (float)(inMin + (double)i*precision);
         out = apply(in);
 
         switch(inputVar) {
@@ -65,10 +83,6 @@ GLfloat* Function::getVertices(unsigned long& numVerts, BoundingBox boundingBox,
 
     }
 
-    numVerts = vertIndex;
-    if (vertIndex%2 == 1) {
-        std::cout << "oh no: " << displaySettings.r << ", " << displaySettings.g << ", " <<displaySettings.b << std::endl;
-    }
+    while (vertIndex < numVerts) {writeVertex(vertices, vertIndex++, 0, 0);}
 
-    return vertices;
 }

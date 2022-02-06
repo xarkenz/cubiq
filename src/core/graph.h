@@ -11,11 +11,15 @@ class Graph {
 
 public:
 
+    static const int NUM_THREADS;
 
     GLfloat* getVertices(unsigned long& numVerts);
-    void calculateVertices(float precision);
+    GLfloat* getVertexList(unsigned long& numVerts);
+    void calculateVertices(double precision);
     BoundingBox getBoundingBox();
     void setBoundingBox(BoundingBox bb);
+
+    std::mutex& getMutex();
 
     explicit Graph(BoundingBox bb);
     Graph();
@@ -28,7 +32,8 @@ private:
 
     std::vector<Equation*> equationList;
 
-    std::vector<GLfloat> vertices;
+    GLfloat* vertices;
+    unsigned long numVertices;
 
     BoundingBox boundingBox;
 

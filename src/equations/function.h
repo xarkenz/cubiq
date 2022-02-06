@@ -2,7 +2,7 @@
 
 #include "equations/equation.h"
 
-class /*[[deprecated("Use ImplicitEquation instead.")]]*/ Function : public Equation {
+class Function : public Equation {
 
 public:
 
@@ -10,9 +10,10 @@ public:
 
     Function(DisplaySettings settings, IndependentVariable inVar, float (*func)(float));
 
-    GLfloat* getVertices(unsigned long& numVerts, BoundingBox boundingBox, float precision) override;
+    unsigned long getNumVertices(BoundingBox boundingBox, double precision) const override;
+    void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
 
-    float apply(float input);
+    float apply(float input) const;
 
 private:
     IndependentVariable inputVar;

@@ -179,27 +179,27 @@ void GraphView::drawGrid() {
 void GraphView::drawElements() {
     bufferIndex = 0; // "Clear" the buffer
 
+    // Lock the graph's mutex while drawing
+    std::scoped_lock<std::mutex> lock(graph->getMutex());
+
     unsigned long numVerts;
     unsigned int count;
-    GLfloat* vertices = graph->getVertices(numVerts);
+    GLfloat* vertices = graph->getVertexList(numVerts);
 
     if (numVerts == 0) { return; }
 
     glLineWidth(2.5f);
 
     const int batchSize = BATCH_SIZE - (BATCH_SIZE%2);
-    GLfloat* ptr = vertices;
 
     while (numVerts > 0) {
         count = (int) std::fminl(batchSize,numVerts);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, ptr);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * VERTEX_BYTES, vertices);
 
         glDrawArrays(GL_LINES, 0, count);
-        ptr += 7 * count;
+        vertices += 7 * count;
         numVerts -= count;
     }
-
-    delete[] vertices;
 
 }
 
@@ -258,10 +258,10 @@ void GraphView::zoom(float steps, QPointF pos) {
     float z = std::fmaxf(1 - sensitivity * steps, sensitivity);
 
     BoundingBox newBounds = {
-            posX - (posX - bounds.minX) * z,
-            posX + (bounds.maxX - posX) * z,
-            posY - (posY - bounds.minY) * z,
-            posY + (bounds.maxY - posY) * z
+            std::fminf(posX - (posX - bounds.minX) * z,posX-0.00001f),
+            std::fmaxf(posX + (bounds.maxX - posX) * z,posX+0.00001f),
+            std::fminf(posY - (posY - bounds.minY) * z,posY-0.00001f),
+            std::fmaxf(posY + (bounds.maxY - posY) * z,posY+0.00001f)
     };
     graph->setBoundingBox(newBounds);
 
@@ -359,11 +359,11 @@ const int GraphView::CalculationThread::MILLIS_PER_UPDATE = 17;
 GraphView::CalculationThread::CalculationThread(GraphView* p, Graph* g) : std::thread(&GraphView::CalculationThread::run, this), parent(p), graph(g), toUpdate(false), toExit(false) {}
 
 void GraphView::CalculationThread::run() {
-    float precision;
+    double precision;
     std::defer_lock_t t;
     while (!toExit) {
         if (toUpdate) {
-            precision = 3 * graph->getBoundingBox().width() / parent->screenW;
+            precision = 3 * (double)(graph->getBoundingBox().width()) / (double)(parent->screenW);
             graph->calculateVertices(precision);
             parent->update();
             toUpdate = false;
