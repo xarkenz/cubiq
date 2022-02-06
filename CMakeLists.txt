@@ -33,17 +33,6 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")	 # Needed for threading on some systems
 
-# Lower compiler optimization for profiling
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer")
-endif()
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	set(OpenMP_CXX "${CMAKE_CXX_COMPILER} -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer")
-endif()
-# -----------------------------------------
-
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(OpenMP REQUIRED)
 
