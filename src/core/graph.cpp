@@ -16,6 +16,7 @@ Graph::~Graph() {
     for (Equation* e : equationList) {
         delete e;
     }
+    delete[] vertices;
 }
 
 
