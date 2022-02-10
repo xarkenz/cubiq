@@ -47,11 +47,22 @@ void GraphView::setGraph(Graph* g) {
     calculationThread.setGraph(g);
 
     adjustCamera();
+    calculationThread.markToUpdate();
     update();
 }
 
 Graph* GraphView::getGraph() {
     return graph;
+}
+
+
+void GraphView::centerOrigin() {
+    BoundingBox bb = graph->getBoundingBox();
+    graph->setBoundingBox(bb.moved(-bb.centerX(), -bb.centerY()));
+
+    adjustCamera();
+    calculationThread.markToUpdate();
+    update();
 }
 
 
@@ -96,8 +107,8 @@ void GraphView::resizeGL(int w, int h) {
     setMinimumWidth(h / 8);
 
     adjustCamera();
-
     calculationThread.markToUpdate();
+    update();
 }
 
 
@@ -138,7 +149,7 @@ void GraphView::drawGrid() {
     const float aspect = (float) screenH / screenW;
     GLint first = bufferIndex;
 
-    const float c1 = 0.3f;
+    const float c1 = 0.2f;
     const float c2 = 0.6f;
     const float c3 = 0.8f;
 
@@ -244,7 +255,7 @@ void GraphView::mouseMoveEvent(QMouseEvent* event) {
 
 
 void GraphView::wheelEvent(QWheelEvent* event) {
-    if (dragging) {return;}
+    if (dragging) return;
 
     QPoint pixelScroll = event->pixelDelta();
     QPoint angleScroll = event->angleDelta() / 8;
@@ -369,7 +380,14 @@ GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSou
 
 const int GraphView::CalculationThread::MILLIS_PER_UPDATE = 17;
 
-GraphView::CalculationThread::CalculationThread(GraphView* p, Graph* g) : std::thread(&GraphView::CalculationThread::run, this), parent(p), graph(g), toUpdate(false), toExit(false) {}
+GraphView::CalculationThread::CalculationThread(GraphView* p, Graph* g) :
+    std::thread(&GraphView::CalculationThread::run, this),
+    parent(p),
+    graph(g),
+    toUpdate(false),
+    toExit(false) {
+
+}
 
 void GraphView::CalculationThread::run() {
     double precision;
@@ -385,7 +403,14 @@ void GraphView::CalculationThread::run() {
     }
 }
 
-void GraphView::CalculationThread::markToUpdate() {toUpdate = true;}
-void GraphView::CalculationThread::markToExit() {toExit = true;}
+void GraphView::CalculationThread::markToUpdate() {
+    toUpdate = true;
+}
 
-void GraphView::CalculationThread::setGraph(Graph* g) { graph = g; }
+void GraphView::CalculationThread::markToExit() {
+    toExit = true;
+}
+
+void GraphView::CalculationThread::setGraph(Graph* g) {
+    graph = g;
+}

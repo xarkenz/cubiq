@@ -3,7 +3,6 @@
 
 #include "main_window.h"
 #include "../equations/function.h"
-#include "equations/implicit_equation.h"
 
 
 MainWindow::MainWindow() :
@@ -11,23 +10,18 @@ MainWindow::MainWindow() :
         equationDock(new QDockWidget(tr("equations"), this)),
         equationList(new QListWidget(equationDock)) {
     setMinimumSize(800, 600);
-    setWindowTitle("[*] Untitled Graph - Cubiq Grapher");
     setCentralWidget(graphView);
     setWindowModified(false);
     createTopBar();
     createGraphView();
     createEquationList();
+    updateInfo();
 }
 
 MainWindow::~MainWindow() {
     delete graphView;
     delete equationList;
     delete equationDock;
-}
-
-
-void MainWindow::closeEvent(QCloseEvent* event) {
-    event->accept();
 }
 
 
@@ -49,40 +43,32 @@ void MainWindow::createGraphView() {
 
     Graph* graph = graphView->getGraph();
 
-
-    auto testFunc1 = [](float x) -> float {return 4.0f * sinf(x * 2.0f) + cosf(x);};
-    Equation::DisplaySettings ds1 {0.8f,0.2f,0.2f,1.0f};
-    Equation* eq1 = new Function(ds1, Function::IndependentVariable::X, testFunc1);
+    auto testFunc1 = [](float x) -> float {return 2.0f * sinf(x * 3.0f) + 2.0f * cosf(x * 1.3f);};
+    Equation* eq1 = new Function({0.8f,0.3f,0.3f,0.9f}, Function::IndependentVariable::X, testFunc1);
     graph->addEquation(eq1);
 
-    auto testFunc2 = [](float y) -> float {return y*y*y*y/16 - y*y*y*5/8 + y*y + y*2;};
-    Equation::DisplaySettings ds2 {0.2f,0.2f,0.8f,1.0f};
-    Equation* eq2 = new Function(ds2, Function::IndependentVariable::Y, testFunc2);
-    graph->addEquation(eq2);
+    /*auto testFunc2 = [](float y) -> float {return y*y*y*y/16 - y*y*y*5/8 + y*y + y*2;};
+    Equation* eq2 = new Function({0.2f,0.2f,0.8f,0.9f}, Function::IndependentVariable::Y, testFunc2);
+    graph->addEquation(eq2);*/
 
     /*auto testFunc3 = [](float x) -> float {return tanf(x);};
-    Equation::DisplaySettings ds3 {0.2f,0.8f,0.2f,1.0f};
-    Equation* eq3 = new Function(ds3, Function::IndependentVariable::X, testFunc3);
+    Equation* eq3 = new Function({0.2f,0.8f,0.2f,0.9f}, Function::IndependentVariable::X, testFunc3);
     graph->addEquation(eq3);*/
 
     /*auto testFunc4 = [](float x, float y) -> float {return x*x/4 + y*y/2 + (x+2)*y/3 - 5;};
-    Equation::DisplaySettings ds4 {0.8f,0.8f,0.2f,1.0f};
-    Equation* eq4 = new ImplicitEquation(ds4, testFunc4);
+    Equation* eq4 = new ImplicitEquation({0.8f,0.8f,0.2f,0.9f}, testFunc4);
     graph->addEquation(eq4);*/
 
     /*auto testFunc5 = [](float x, float y) -> float {return x*y;};
-    Equation::DisplaySettings ds5 {0.8f,0.2f,0.8f,1.0f};
-    Equation* eq5 = new ImplicitEquation(ds5, testFunc5);
+    Equation* eq5 = new ImplicitEquation({0.8f,0.2f,0.8f,0.9f}, testFunc5);
     graph->addEquation(eq5);*/
 
     /*auto disgustingFunc1 = [](float x, float y) -> float {return tan(pow(x, y)) - sin(pow(x, cos(y)));};
-    Equation::DisplaySettings dsg1 {0.8f,0.8f,0.2f,1.0f};
-    Equation* eqg1 = new ImplicitEquation(dsg1, disgustingFunc1);
+    Equation* eqg1 = new ImplicitEquation({0.8f,0.8f,0.2f,0.9f}, disgustingFunc1);
     graph->addEquation(eqg1);*/
 
     /*auto disgustingFunc2 = [](float x, float y) -> float {return tan(x*x + y*y) - 1;};
-    Equation::DisplaySettings dsg2 {0.8f,0.8f,0.2f,1.0f};
-    Equation* eqg2 = new ImplicitEquation(dsg2, disgustingFunc2);
+    Equation* eqg2 = new ImplicitEquation({0.8f,0.8f,0.2f,0.9f}, disgustingFunc2);
     graph->addEquation(eqg2);*/
 
     setWindowModified(true);
@@ -106,6 +92,8 @@ void MainWindow::createTopBar() {
     QAction* aCopy = createAction("copy", "Copy", SLOT(handleCopy()), "Ctrl+C", "Copy the current selection to clipboard.");
     QAction* aCut = createAction("cut", "Cut", SLOT(handleCut()), "Ctrl+X", "Cut the current selection to clipboard.");
 
+    QAction* aOrigin = createAction("origin", "Return to Origin", SLOT(handleOrigin()), "Ctrl+.", "Center the view on (0, 0).");
+
     QMenu* mFile = menuBar()->addMenu("File");
     mFile->addAction(aNew);
     mFile->addAction(aOpen);
@@ -119,14 +107,39 @@ void MainWindow::createTopBar() {
     mEdit->addAction(aCut);
 
     QMenu* mView = menuBar()->addMenu("View");
+    mView->addAction(aOrigin);
 
     QMenu* mWindow = menuBar()->addMenu("Window");
 
     QMenu* mHelp = menuBar()->addMenu("Help");
+
+    QToolBar* toolBar = addToolBar("Quick Actions");
+    toolBar->setMovable(false);
+    toolBar->setFloatable(false);
+    toolBar->setAllowedAreas(Qt::TopToolBarArea);
+
+    toolBar->addAction(aNew);
+    toolBar->addAction(aOpen);
+    toolBar->addAction(aSave);
+    toolBar->addAction(aSaveAs);
+    toolBar->addSeparator();
+    toolBar->addAction(aCopy);
+    toolBar->addAction(aCut);
+    toolBar->addSeparator();
+    toolBar->addAction(aOrigin);
+
+    auto* spacer = new QWidget;
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    toolBar->addWidget(spacer);
+
+    auto* cornerIcon = new QLabel;
+    cornerIcon->setPixmap(QIcon(":/icons/cubiq_base").pixmap(toolBar->iconSize()));
+    cornerIcon->setStyleSheet("padding-right: 10px;");
+    toolBar->addWidget(cornerIcon);
 }
 
 
-void MainWindow::handleNew() {
+bool MainWindow::checkUnsavedChanges() {
     if (isWindowModified()) {
         QMessageBox dialog;
         dialog.setIcon(QMessageBox::Question);
@@ -134,19 +147,35 @@ void MainWindow::handleNew() {
         dialog.setInformativeText("Would you like to save them?");
         dialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         dialog.setDefaultButton(QMessageBox::Save);
-        int option = dialog.exec();
 
+        int option = dialog.exec();
         switch (option) {
-            case QMessageBox::Save: {
-                bool saved = handleSave();
-                if (!saved) break; // Does not run at the moment; save logic not implemented
-            }
+            case QMessageBox::Save:
+                return handleSave();
             case QMessageBox::Discard:
-                graphView->setGraph(new Graph());
-                break;
+                setWindowModified(false);
+                return true;
             default:
-                break;
+                return false;
         }
+    }
+    return true;
+}
+
+
+void MainWindow::closeEvent(QCloseEvent* event) {
+    if (checkUnsavedChanges()) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
+
+
+void MainWindow::handleNew() {
+    if (checkUnsavedChanges()) {
+        graphView->setGraph(new Graph());
+        updateInfo();
     }
 }
 
@@ -167,7 +196,8 @@ bool MainWindow::handleSaveAs() {
 }
 
 void MainWindow::handleSettings() {
-    // Open settings dialog
+    SettingsDialog dialog;
+    dialog.exec();
 }
 
 void MainWindow::handleCopy() {
@@ -176,4 +206,15 @@ void MainWindow::handleCopy() {
 
 void MainWindow::handleCut() {
     // Cut
+}
+
+void MainWindow::handleOrigin() {
+    graphView->centerOrigin();
+}
+
+
+void MainWindow::updateInfo() {
+    QString title("[*] - Cubiq Grapher");
+    setWindowTitle(title.insert(3, graphView->getGraph()->getName()));
+    update();
 }

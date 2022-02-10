@@ -45,6 +45,8 @@ public:
     void setGraph(Graph* g);
     Graph* getGraph();
 
+    void centerOrigin();
+
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;

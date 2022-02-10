@@ -4,17 +4,15 @@
 #include <QListWidget>
 
 #include "core/graph_view.h"
+#include "core/settings_dialog.h"
 
 
 class MainWindow : public QMainWindow {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     MainWindow();
     ~MainWindow();
-
-protected:
-    void closeEvent(QCloseEvent* event) override;
 
 private:
     GraphView* graphView;
@@ -27,6 +25,11 @@ private:
     void createEquationList();
     void createTopBar();
 
+    bool checkUnsavedChanges();
+
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 public slots:
     void handleNew();
     void handleOpen();
@@ -36,5 +39,9 @@ public slots:
 
     void handleCopy();
     void handleCut();
+
+    void handleOrigin();
+
+    void updateInfo();
 
 };

@@ -1,10 +1,11 @@
 #include <cstring>
+#include <utility>
 #include "graph.h"
 
 
 const int Graph::NUM_THREADS = 2; // Number of threads to use for parallel computing
 
-Graph::Graph(BoundingBox bb) : boundingBox(bb), equationList() {
+Graph::Graph(BoundingBox bb) : boundingBox(bb), equationList(), name("Untitled Graph") {
     numVertices = 0;
     vertices = nullptr;
 }
@@ -17,6 +18,31 @@ Graph::~Graph() {
         delete e;
     }
     delete[] vertices;
+}
+
+
+QString Graph::getName() const {
+    return name;
+}
+
+QString Graph::getDescription() const {
+    return description;
+}
+
+QString Graph::getAuthor() const {
+    return author;
+}
+
+void Graph::setName(QString s) {
+    name = std::move(s);
+}
+
+void Graph::setDescription(QString s) {
+    description = std::move(s);
+}
+
+void Graph::setAuthor(QString s) {
+    author = std::move(s);
 }
 
 

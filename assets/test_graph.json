@@ -1,0 +1,17 @@
+{
+  "name": "Testing Graph",
+  "description": "Some very fascinating tests. Super interesting, huh?",
+  "author": "the devs",
+  "show_grid": true,
+  "elements": [
+    {
+      "type": "xy",
+      "content": "y=x",
+      "color": "RED"
+    }, {
+      "type": "xy",
+      "content": "x^{2}+y^{2}=25",
+      "color": "YELLOW"
+    }
+  ]
+}

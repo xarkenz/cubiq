@@ -3,6 +3,7 @@
 #include <vector>
 #include <mutex>
 #include <QOpenGLBuffer>
+#include <QString>
 #include "equations/equation.h"
 #include "core/bounding_box.h"
 
@@ -27,7 +28,18 @@ public:
 
     void addEquation(Equation* e);
 
+    QString getName() const;
+    QString getDescription() const;
+    QString getAuthor() const;
+
+    void setName(QString s);
+    void setDescription(QString s);
+    void setAuthor(QString s);
+
 private:
+    QString name, description, author;
+    bool grid;
+
     std::mutex mutex;
 
     std::vector<Equation*> equationList;

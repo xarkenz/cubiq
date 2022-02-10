@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("Cubiq");
-    QCoreApplication::setApplicationName("Cubiq Grapher");
+    QCoreApplication::setApplicationName("Grapher");
     QApplication::setWindowIcon(QIcon(":/icons/cubiq_bg"));
 
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, false);
