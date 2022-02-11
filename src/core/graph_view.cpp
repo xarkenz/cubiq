@@ -319,9 +319,31 @@ namespace Cubiq {
     }
 
 
-    GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSource, int attribCount,
-                                   const char* attribs[]) {
+    GLuint GraphView::createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]) {
         initializeOpenGLFunctions();
+
+        // Determine system GLSL version
+        std::string glslVersionStr((char*) glGetString(GL_SHADING_LANGUAGE_VERSION));
+        std::string vertexSourceStr("#version ");
+        std::string fragmentSourceStr("#version ");
+
+        // Convert version string to number compatible with #version directive
+        for (char c : glslVersionStr) {
+            if (std::isdigit(c)) {
+                vertexSourceStr += c;
+                fragmentSourceStr += c;
+            } else if (std::isspace(c)) break;
+        }
+
+        // Add the rest of the shader source
+        vertexSourceStr += "\n";
+        vertexSourceStr += vertexSource;
+        fragmentSourceStr += "\n";
+        fragmentSourceStr += fragmentSource;
+
+        // Get C-style string source for each shader
+        const char* vertexSourceData = vertexSourceStr.data();
+        const char* fragmentSourceData = fragmentSourceStr.data();
 
         // Create shader objects
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -331,7 +353,7 @@ namespace Cubiq {
         int infoLogLength;
 
         // Compile vertex shader
-        glShaderSource(vertexShader, 1, &vertexSource, NULL);
+        glShaderSource(vertexShader, 1, &vertexSourceData, NULL);
         glCompileShader(vertexShader);
 
         glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
@@ -343,7 +365,7 @@ namespace Cubiq {
         }
 
         // Compile fragment shader
-        glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+        glShaderSource(fragmentShader, 1, &fragmentSourceData, NULL);
         glCompileShader(fragmentShader);
 
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
