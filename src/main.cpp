@@ -4,6 +4,8 @@
 
 #include "core/main_window.h"
 
+#include "style/dark_qss.h"
+
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
@@ -11,7 +13,7 @@ int main(int argc, char* argv[]) {
     QCoreApplication::setApplicationName("Grapher");
     QApplication::setWindowIcon(QIcon(":/icons/cubiq_bg"));
 
-    QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, false);
+    app.setStyleSheet(DARK_QSS);
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());

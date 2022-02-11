@@ -5,16 +5,13 @@
 
 #include <QWheelEvent>
 
+#include "shader/basic_vertex_glsl.h"
+#include "shader/basic_fragment_glsl.h"
+
 
 const int GraphView::BATCH_SIZE = 5000;
 
 const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
-
-const char* BASIC_VERTEX =
-#include "shader/basic_vertex_glsl.h"
-
-const char* BASIC_FRAGMENT =
-#include "shader/basic_fragment_glsl.h"
 
 
 GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent), calculationThread(this, g) {
@@ -79,7 +76,7 @@ void GraphView::initializeGL() {
 
     // Compile and link shader program
     const char* attribs[] = {"vPos", "vColor"};
-    shaderProgram = createShader(BASIC_VERTEX, BASIC_FRAGMENT, 2, attribs);
+    shaderProgram = createShader(BASIC_VERTEX_GLSL, BASIC_FRAGMENT_GLSL, 2, attribs);
     glUseProgram(shaderProgram);
 
     // Generate vertex array object

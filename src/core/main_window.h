@@ -19,7 +19,7 @@ private:
     QDockWidget* equationDock;
     QListWidget* equationList;
 
-    QAction* createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* whatsThis);
+    QAction* createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip);
 
     void createGraphView();
     void createEquationList();

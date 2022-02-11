@@ -7,7 +7,7 @@
 
 MainWindow::MainWindow() :
         graphView(new GraphView(this,new Graph())),
-        equationDock(new QDockWidget(tr("equations"), this)),
+        equationDock(new QDockWidget(tr("Equations"), this)),
         equationList(new QListWidget(equationDock)) {
     setMinimumSize(800, 600);
     setCentralWidget(graphView);
@@ -25,18 +25,19 @@ MainWindow::~MainWindow() {
 }
 
 
-QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* whatsThis) {
+QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip) {
     std::string iconFile(":/icons/");
     iconFile += name;
     auto* action = new QAction(QIcon(iconFile.c_str()), tr(text), this);
     action->setShortcut(tr(shortcut));
-    action->setWhatsThis(whatsThis);
+    action->setToolTip(toolTip);
     connect(action, SIGNAL(triggered()), this, slot);
     return action;
 }
 
 
 void MainWindow::createGraphView() {
+    // Enable multisampling
     QSurfaceFormat format;
     format.setSamples(4);
     graphView->setFormat(format);
@@ -77,23 +78,27 @@ void MainWindow::createGraphView() {
 
 void MainWindow::createEquationList() {
     equationDock->setWidget(equationList);
-    equationList->addItem(QString("equations go here"));
+    equationList->setWordWrap(true);
+    equationList->addItem(tr("A lot more needs to be finished before there can be anything interesting here."));
+    equationList->addItem(tr("\nAlso, this sidebar will ideally look much different when finished."));
     addDockWidget(Qt::LeftDockWidgetArea, equationDock);
 }
 
 
 void MainWindow::createTopBar() {
+    // Define all menu actions
     QAction* aNew = createAction("new", "New", SLOT(handleNew()), "Ctrl+N", "Create a new graph.");
     QAction* aOpen = createAction("open", "Open...", SLOT(handleOpen()), "Ctrl+O", "Open a graph from file.");
     QAction* aSave = createAction("save", "Save", SLOT(handleSave()), "Ctrl+S", "Save the current graph.");
     QAction* aSaveAs = createAction("saveas", "Save as...", SLOT(handleSaveAs()), "Ctrl+Shift+S", "Save the graph under a new name.");
-    QAction* aSettings = createAction("settings", "Settings...", SLOT(handleSettings()), "Ctrl+Alt+S", "Configure the look and feel of Cubiq.");
+    QAction* aSettings = createAction("settings", "Settings...", SLOT(handleSettings()), "Ctrl+Alt+S", "Configure the look and feel of the program.");
 
     QAction* aCopy = createAction("copy", "Copy", SLOT(handleCopy()), "Ctrl+C", "Copy the current selection to clipboard.");
     QAction* aCut = createAction("cut", "Cut", SLOT(handleCut()), "Ctrl+X", "Cut the current selection to clipboard.");
 
     QAction* aOrigin = createAction("origin", "Return to Origin", SLOT(handleOrigin()), "Ctrl+.", "Center the view on (0, 0).");
 
+    // Create menus and add respective actions
     QMenu* mFile = menuBar()->addMenu("File");
     mFile->addAction(aNew);
     mFile->addAction(aOpen);
@@ -113,6 +118,7 @@ void MainWindow::createTopBar() {
 
     QMenu* mHelp = menuBar()->addMenu("Help");
 
+    // Create quick action toolbar
     QToolBar* toolBar = addToolBar("Quick Actions");
     toolBar->setMovable(false);
     toolBar->setFloatable(false);
@@ -128,6 +134,7 @@ void MainWindow::createTopBar() {
     toolBar->addSeparator();
     toolBar->addAction(aOrigin);
 
+    // Add a corner icon to the toolbar
     auto* spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
