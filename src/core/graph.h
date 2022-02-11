@@ -4,50 +4,53 @@
 #include <mutex>
 #include <QOpenGLBuffer>
 #include <QString>
+
 #include "equations/equation.h"
 #include "core/bounding_box.h"
 
 
-class Graph {
+namespace Cubiq {
 
-public:
+    class Graph {
 
-    static const int NUM_THREADS;
+    public:
+        static const int NUM_THREADS;
 
-    GLfloat* getVertices(unsigned long& numVerts);
-    GLfloat* getVertexList(unsigned long& numVerts);
-    void calculateVertices(double precision);
-    BoundingBox getBoundingBox();
-    void setBoundingBox(BoundingBox bb);
+        GLfloat* getVertices(unsigned long& numVerts);
+        GLfloat* getVertexList(unsigned long& numVerts);
+        void calculateVertices(double precision);
 
-    std::mutex& getMutex();
+        BoundingBox getBoundingBox();
+        void setBoundingBox(BoundingBox bb);
 
-    explicit Graph(BoundingBox bb);
-    Graph();
-    ~Graph();
+        std::mutex& getMutex();
 
-    void addEquation(Equation* e);
+        explicit Graph(BoundingBox bb);
+        Graph();
+        ~Graph();
 
-    QString getName() const;
-    QString getDescription() const;
-    QString getAuthor() const;
+        void addEquation(Equation* e);
 
-    void setName(QString s);
-    void setDescription(QString s);
-    void setAuthor(QString s);
+        QString getName() const;
+        QString getDescription() const;
+        QString getAuthor() const;
+        void setName(QString s);
+        void setDescription(QString s);
+        void setAuthor(QString s);
 
-private:
-    QString name, description, author;
-    bool grid;
+    private:
+        QString name, description, author;
+        bool grid;
 
-    std::mutex mutex;
+        std::mutex mutex;
 
-    std::vector<Equation*> equationList;
+        std::vector<Equation*> equationList;
 
-    GLfloat* vertices;
-    unsigned long numVertices;
+        GLfloat* vertices;
+        unsigned long numVertices;
 
-    BoundingBox boundingBox;
+        BoundingBox boundingBox;
 
-};
+    };
 
+}

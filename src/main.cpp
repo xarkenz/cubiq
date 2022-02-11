@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QPushButton>
 
 #include "core/main_window.h"
 
@@ -20,7 +19,7 @@ int main(int argc, char* argv[]) {
     parser.addHelpOption();
     parser.process(app);
 
-    MainWindow mainWin;
+    Cubiq::MainWindow mainWin;
     mainWin.showMaximized();
 
     return QApplication::exec();

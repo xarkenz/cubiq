@@ -11,53 +11,62 @@ class QStackedWidget;
 class QSpinBox;
 
 
-class SettingsPage : public QWidget {
+namespace Cubiq {
+
+    class SettingsPage : public QWidget {
     Q_OBJECT
 
-public:
-    virtual void saveSettings(QSettings& settings) = 0;
+    public:
+        virtual void saveSettings(QSettings& settings) = 0;
 
-};
+    };
 
 
-class GeneralSettingsPage : public SettingsPage {
+    class GeneralSettingsPage : public SettingsPage {
     Q_OBJECT
 
-public:
-    explicit GeneralSettingsPage(QSettings& settings);
-    void saveSettings(QSettings& settings);
+    public:
+        explicit GeneralSettingsPage(QSettings& settings);
 
-};
+        void saveSettings(QSettings& settings);
+
+    };
 
 
-class DisplaySettingsPage : public SettingsPage {
+    class DisplaySettingsPage : public SettingsPage {
     Q_OBJECT
 
-public:
-    explicit DisplaySettingsPage(QSettings& settings);
-    void saveSettings(QSettings& settings);
+    public:
+        explicit DisplaySettingsPage(QSettings& settings);
 
-private:
-    QSpinBox* cfgSampleWidth;
+        void saveSettings(QSettings& settings);
 
-};
+    private:
+        QSpinBox* cfgSampleWidth;
+
+    };
 
 
-class SettingsDialog : public QDialog {
+    class SettingsDialog : public QDialog {
     Q_OBJECT
 
-public:
-    SettingsDialog();
+    public:
+        SettingsDialog();
 
-public slots:
-    void changePage(QListWidgetItem* toPage, QListWidgetItem* fromPage);
-    void save();
-    void saveClose();
+    public slots:
 
-private:
-    QListWidget* pageSelector;
-    QStackedWidget* pageContainer;
+        void changePage(QListWidgetItem* toPage, QListWidgetItem* fromPage);
 
-    QSettings settings;
+        void save();
 
-};
+        void saveClose();
+
+    private:
+        QListWidget* pageSelector;
+        QStackedWidget* pageContainer;
+
+        QSettings settings;
+
+    };
+
+}

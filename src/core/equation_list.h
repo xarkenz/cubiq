@@ -6,23 +6,25 @@
 #include <QLineEdit>
 
 
-class EquationListItem : public QLineEdit {
+namespace Cubiq {
+
+    class EquationListItem : public QLineEdit {
+
+    };
 
 
+    class EquationList : public QWidget {
 
-};
+    public:
+        EquationList(QWidget* parent);
 
+        void addItem(EquationListItem* item);
 
-class EquationList : public QWidget {
+        std::vector<EquationListItem*>& getItemList();
 
-public:
-    EquationList(QWidget* parent);
+    private:
+        std::vector<EquationListItem*> items;
 
-    void addItem(EquationListItem* item);
+    };
 
-    std::vector<EquationListItem*>& getItemList();
-
-private:
-    std::vector<EquationListItem*> items;
-
-};
+}

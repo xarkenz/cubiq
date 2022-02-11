@@ -1,88 +1,94 @@
+#include "function.h"
 
 #include <cmath>
-#include "function.h"
-#include <iostream>
-
-Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, float (*func)(float)) : Equation(settings) {
-    inputVar = inVar;
-    function = func;
-}
-
-float Function::apply(float input) const {
-    return (*function)(input);
-}
 
 
-unsigned long Function::getNumVertices(BoundingBox boundingBox, double precision) const {
-    double inMin = 0, inMax = 0;
-    switch (inputVar) {
-        case Function::IndependentVariable::X:
-            inMin = std::floor(boundingBox.minX/precision)*precision;
-            inMax = std::ceil(boundingBox.maxX/precision)*precision;
-            break;
-        case Function::IndependentVariable::Y:
-            inMin = std::floor(boundingBox.minY/precision)*precision;
-            inMax = std::ceil(boundingBox.maxY/precision)*precision;
-            break;
+namespace Cubiq {
+
+    Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, float (* func)(float)) : Equation(
+            settings) {
+        inputVar = inVar;
+        function = func;
     }
 
-    if (inMax <= inMin) {return 0;}
-    return 2*(unsigned long)((inMax - inMin)/precision);
-}
 
-void Function::writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const {
-
-    unsigned long numVerts = getNumVertices(boundingBox,precision);
-
-    if (numVerts == 0) {return;}
-
-    double inMin = 0, outMin = 0, outMax = 0;
-    switch (inputVar) {
-        case Function::IndependentVariable::X:
-            inMin = std::floor(boundingBox.minX/precision)*precision;
-            outMin = std::floor(boundingBox.minY/precision)*precision;
-            outMax = std::ceil(boundingBox.maxY/precision)*precision;
-            break;
-        case Function::IndependentVariable::Y:
-            inMin = std::floor(boundingBox.minY/precision)*precision;
-            outMin = std::floor(boundingBox.minX/precision)*precision;
-            outMax = std::ceil(boundingBox.maxX/precision)*precision;
-            break;
+    float Function::apply(float input) const {
+        return (*function)(input);
     }
 
-    unsigned long numSegments = numVerts/2;
 
-    float in, out, x, y, prevX, prevY;
-    int vertIndex = 0;
-    bool inBounds,prevInBounds;
-    for (long i = 0; i < numSegments+1; i++) {
-        in = (float)(inMin + (double)i*precision);
-        out = apply(in);
-
-        switch(inputVar) {
+    unsigned long Function::getNumVertices(BoundingBox boundingBox, double precision) const {
+        double inMin = 0, inMax = 0;
+        switch (inputVar) {
             case Function::IndependentVariable::X:
-                x = in;
-                y = out;
+                inMin = std::floor(boundingBox.minX / precision) * precision;
+                inMax = std::ceil(boundingBox.maxX / precision) * precision;
                 break;
             case Function::IndependentVariable::Y:
-                y = in;
-                x = out;
+                inMin = std::floor(boundingBox.minY / precision) * precision;
+                inMax = std::ceil(boundingBox.maxY / precision) * precision;
                 break;
         }
 
-        inBounds = out <= outMax && out >= outMin;
-
-        if (i > 0 && (prevInBounds || inBounds)) {
-            writeVertex(vertices, vertIndex++, prevX, prevY);
-            writeVertex(vertices, vertIndex++, x, y);
-        }
-
-        prevX = x;
-        prevY = y;
-        prevInBounds = inBounds;
-
+        if (inMax <= inMin) { return 0; }
+        return 2 * (unsigned long) ((inMax - inMin) / precision);
     }
 
-    while (vertIndex < numVerts) {writeVertex(vertices, vertIndex++, 0, 0);}
+    void Function::writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const {
+
+        unsigned long numVerts = getNumVertices(boundingBox, precision);
+
+        if (numVerts == 0) { return; }
+
+        double inMin = 0, outMin = 0, outMax = 0;
+        switch (inputVar) {
+            case Function::IndependentVariable::X:
+                inMin = std::floor(boundingBox.minX / precision) * precision;
+                outMin = std::floor(boundingBox.minY / precision) * precision;
+                outMax = std::ceil(boundingBox.maxY / precision) * precision;
+                break;
+            case Function::IndependentVariable::Y:
+                inMin = std::floor(boundingBox.minY / precision) * precision;
+                outMin = std::floor(boundingBox.minX / precision) * precision;
+                outMax = std::ceil(boundingBox.maxX / precision) * precision;
+                break;
+        }
+
+        unsigned long numSegments = numVerts / 2;
+
+        float in, out, x, y, prevX, prevY;
+        int vertIndex = 0;
+        bool inBounds, prevInBounds;
+        for (long i = 0; i < numSegments + 1; i++) {
+            in = (float) (inMin + (double) i * precision);
+            out = apply(in);
+
+            switch (inputVar) {
+                case Function::IndependentVariable::X:
+                    x = in;
+                    y = out;
+                    break;
+                case Function::IndependentVariable::Y:
+                    y = in;
+                    x = out;
+                    break;
+            }
+
+            inBounds = out <= outMax && out >= outMin;
+
+            if (i > 0 && (prevInBounds || inBounds)) {
+                writeVertex(vertices, vertIndex++, prevX, prevY);
+                writeVertex(vertices, vertIndex++, x, y);
+            }
+
+            prevX = x;
+            prevY = y;
+            prevInBounds = inBounds;
+
+        }
+
+        while (vertIndex < numVerts) { writeVertex(vertices, vertIndex++, 0, 0); }
+
+    }
 
 }

@@ -1,22 +1,28 @@
 #pragma once
 
-#include "equations/equation.h"
+#include "equation.h"
 
-class Function : public Equation {
 
-public:
+namespace Cubiq {
 
-    enum class IndependentVariable {X, Y};
+    class Function : public Equation {
 
-    Function(DisplaySettings settings, IndependentVariable inVar, float (*func)(float));
+    public:
+        enum class IndependentVariable {
+            X, Y
+        };
 
-    unsigned long getNumVertices(BoundingBox boundingBox, double precision) const override;
-    void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
+        Function(DisplaySettings settings, IndependentVariable inVar, float (* func)(float));
 
-    float apply(float input) const;
+        unsigned long getNumVertices(BoundingBox boundingBox, double precision) const override;
+        void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
 
-private:
-    IndependentVariable inputVar;
-    float (*function)(float);
+        float apply(float input) const;
 
-};
+    private:
+        IndependentVariable inputVar;
+        float (* function)(float);
+
+    };
+
+}

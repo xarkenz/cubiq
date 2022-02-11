@@ -1,6 +1,10 @@
 #include "equation_list.h"
 
 
-EquationList::EquationList(QWidget* parent) {
+namespace Cubiq {
+
+    EquationList::EquationList(QWidget* parent) {
+
+    }
 
 }

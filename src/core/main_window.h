@@ -7,41 +7,53 @@
 #include "core/settings_dialog.h"
 
 
-class MainWindow : public QMainWindow {
+namespace Cubiq {
+
+    class MainWindow : public QMainWindow {
     Q_OBJECT
 
-public:
-    MainWindow();
-    ~MainWindow();
+    public:
+        MainWindow();
 
-private:
-    GraphView* graphView;
-    QDockWidget* equationDock;
-    QListWidget* equationList;
+    private:
+        GraphView* graphView;
+        QDockWidget* equationDock;
+        QListWidget* equationList;
 
-    QAction* createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip);
+        QAction*
+        createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip);
 
-    void createGraphView();
-    void createEquationList();
-    void createTopBar();
+        void createGraphView();
 
-    bool checkUnsavedChanges();
+        void createEquationList();
 
-protected:
-    void closeEvent(QCloseEvent* event) override;
+        void createTopBar();
 
-public slots:
-    void handleNew();
-    void handleOpen();
-    bool handleSave();
-    bool handleSaveAs();
-    void handleSettings();
+        bool checkUnsavedChanges();
 
-    void handleCopy();
-    void handleCut();
+    protected:
+        void closeEvent(QCloseEvent* event) override;
 
-    void handleOrigin();
+    public slots:
 
-    void updateInfo();
+        void handleNew();
 
-};
+        void handleOpen();
+
+        bool handleSave();
+
+        bool handleSaveAs();
+
+        void handleSettings();
+
+        void handleCopy();
+
+        void handleCut();
+
+        void handleOrigin();
+
+        void updateInfo();
+
+    };
+
+}
