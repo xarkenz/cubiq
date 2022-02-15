@@ -324,22 +324,24 @@ namespace Cubiq {
 
         // Determine system GLSL version
         std::string glslVersionStr((char*) glGetString(GL_SHADING_LANGUAGE_VERSION));
-        std::string vertexSourceStr("#version ");
-        std::string fragmentSourceStr("#version ");
+        std::string glslVersionID;
 
         // Convert version string to number compatible with #version directive
         for (char c : glslVersionStr) {
             if (std::isdigit(c)) {
-                vertexSourceStr += c;
-                fragmentSourceStr += c;
+                glslVersionID += c;
             } else if (std::isspace(c)) break;
         }
 
-        // Add the rest of the shader source
-        vertexSourceStr += "\n";
-        vertexSourceStr += vertexSource;
-        fragmentSourceStr += "\n";
-        fragmentSourceStr += fragmentSource;
+        // Ensure version does not exceed latest supported version
+        if (std::stoi(glslVersionID, nullptr) > 460)
+            glslVersionID = "460";
+
+        // Create new source strings with version included
+        std::string vertexSourceStr("#version ");
+        std::string fragmentSourceStr("#version ");
+        vertexSourceStr += glslVersionID + "\n" + vertexSource;
+        fragmentSourceStr += glslVersionID + "\n" + fragmentSource;
 
         // Get C-style string source for each shader
         const char* vertexSourceData = vertexSourceStr.data();
