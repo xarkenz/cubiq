@@ -5,12 +5,70 @@
 
 namespace Cubiq {
 
-    ImplicitEquation::ImplicitEquation(DisplaySettings settings, std::function<float(float,float)> func) : Equation(settings) {
+    /*ImplicitEquation::ImplicitEquation(DisplaySettings settings, std::function<float(float,float)> func) : Equation(settings) {
         function = std::move(func);
+    }*/
+
+    ImplicitEquation::ImplicitEquation(DisplaySettings settings, Parser::Expression expr) : Equation(settings) {
+        expression = std::move(expr);
     }
 
-    float ImplicitEquation::apply(float x, float y) const {
+    /*float ImplicitEquation::apply(float x, float y) const {
         return function(x,y);
+    }*/
+
+    float ImplicitEquation::apply(float x, float y) const {
+        return eval(expression.getChildren().data(),x,y) - eval(expression.getChildren().data()+1,x,y);
+    }
+
+    float ImplicitEquation::eval(const Parser::Expression* expr, float x, float y) {
+        if (expr->isEmpty()) {
+            if (expr->getChildren().size() == 0) {return 0;}
+            else {return eval(expr->getChildren().data(),x,y);} // TODO: idk if I need this
+        }
+        else if (expr->isNumber()) {return expr->getNumber();}
+        else if (expr->isSymbol()) {
+            std::string name = expr->getSymbol().name;
+            if (name == "x") { return x; }
+            else if (name == "y") { return y; }
+            else {return 0;}
+        }
+        else if (expr->isOperation()) { // TODO: clean up
+            switch(expr->getOperation()) {
+                case Parser::Operation::ADD:
+                    return eval(expr->getChildren().data(),x,y) + eval(expr->getChildren().data()+1,x,y);
+                case Parser::Operation::SUB:
+                    return eval(expr->getChildren().data(),x,y) - eval(expr->getChildren().data()+1,x,y);
+                case Parser::Operation::MUL:
+                    return eval(expr->getChildren().data(),x,y) * eval(expr->getChildren().data()+1,x,y);
+                case Parser::Operation::DIV:
+                    return eval(expr->getChildren().data(),x,y) / eval(expr->getChildren().data()+1,x,y);
+                case Parser::Operation::POS:
+                    return eval(expr->getChildren().data(),x,y);
+                case Parser::Operation::NEG:
+                    return -eval(expr->getChildren().data(),x,y);
+                case Parser::Operation::EXP:
+                    return powf(eval(expr->getChildren().data(),x,y), eval(expr->getChildren().data()+1,x,y));
+                case Parser::Operation::SQRT:
+                    return powf(eval(expr->getChildren().data()+1,x,y), 1.0f/eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::FACT:
+                    return std::tgamma(1+eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::SIN:
+                    return std::sinf(eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::COS:
+                    return std::cosf(eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::TAN:
+                    return std::tanf(eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::SEC:
+                    return 1.0f/std::cosf(eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::CSC:
+                    return 1.0f/std::sinf(eval(expr->getChildren().data(),x,y));
+                case Parser::Operation::COT:
+                    return 1.0f/std::tanf(eval(expr->getChildren().data(),x,y));
+                default:
+                    return 0; // TODO: account for more things
+            }
+        }
     }
 
     unsigned long ImplicitEquation::getNumVertices(BoundingBox boundingBox, double precision) const {
@@ -88,6 +146,14 @@ namespace Cubiq {
                 if (tl == 0 and bl == 0) {
                     writeVertex(vertices, vertIndex++, l, t);
                     writeVertex(vertices, vertIndex++, l, b);
+                }
+                if (bl == 0 and tr == 0) {
+                    writeVertex(vertices, vertIndex++, l, b);
+                    writeVertex(vertices, vertIndex++, r, t);
+                }
+                if (tl == 0 and br == 0) {
+                    writeVertex(vertices, vertIndex++, l, t);
+                    writeVertex(vertices, vertIndex++, r, b);
                 }
 
 

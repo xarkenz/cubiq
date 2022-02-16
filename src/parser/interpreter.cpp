@@ -58,6 +58,12 @@ namespace Cubiq::Parser {
                         numOperands = 1;
                         break;
 
+                    case Operation::SIN:
+                    case Operation::COS:
+                    case Operation::TAN:
+                    case Operation::SEC:
+                    case Operation::CSC:
+                    case Operation::COT:
                     case Operation::POS:
                     case Operation::NEG:
                     case Operation::B_NOT:
@@ -153,6 +159,18 @@ namespace Cubiq::Parser {
                 return OperatorInfo(Operation::EXP);
             if (symbol == "\\sqrt")
                 return OperatorInfo(Operation::SQRT);
+            if (symbol == "\\sin")
+                return OperatorInfo(Operation::SIN);
+            if (symbol == "\\cos")
+                return OperatorInfo(Operation::COS);
+            if (symbol == "\\tan")
+                return OperatorInfo(Operation::TAN);
+            if (symbol == "\\sec")
+                return OperatorInfo(Operation::SEC);
+            if (symbol == "\\csc")
+                return OperatorInfo(Operation::CSC);
+            if (symbol == "\\cot")
+                return OperatorInfo(Operation::COT);
             if (symbol == "!")
                 return OperatorInfo(Operation::FACT);
             if (symbol == "\\lnot" || symbol == "\\neg")
@@ -175,7 +193,7 @@ namespace Cubiq::Parser {
                 return OperatorInfo(Operation::B_LSHIFT);
             if (symbol == "\\gg")
                 return OperatorInfo(Operation::B_RSHIFT);
-            if (symbol == "\\cdot")
+            if (symbol == "*" || symbol == "\\cdot")
                 return OperatorInfo(Operation::MUL);
             if (symbol == "=")
                 return OperatorInfo(Operation::EQ);

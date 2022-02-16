@@ -31,6 +31,7 @@ namespace Cubiq {
     }
 
     Equation* Equation::setFromString(std::string str) {
+        //std::cout << str << std::endl;
         std::istringstream reader(str);
         reader.seekg(0);
         Parser::CharStream stream = [&reader]() -> int {
@@ -58,45 +59,7 @@ namespace Cubiq {
 
         int a = 0;
         // TODO: add support for Function
-        std::function<float(float,float)> func = [expr](float x, float y) -> float {return eval(expr.getChildren().at(0),x,y) - eval(expr.getChildren().at(1),x,y);};
-        return new ImplicitEquation(displaySettings, func);
-    }
-
-    float Equation::eval(Parser::Expression expr, float x, float y) {
-        if (expr.isEmpty()) {
-            if (expr.getChildren().size() == 0) {return 0;}
-            else {return eval(expr.getChildren().at(0),x,y);} // TODO: idk if I need this
-        }
-        else if (expr.isNumber()) {return expr.getNumber();}
-        else if (expr.isSymbol()) {
-            std::string name = expr.getSymbol().name;
-            if (name == "x") { return x; }
-            else if (name == "y") { return y; }
-            else {return 0;}
-        }
-        else if (expr.isOperation()) {
-            switch(expr.getOperation()) {
-                case Parser::Operation::ADD:
-                    return eval(expr.getChildren().at(0),x,y) + eval(expr.getChildren().at(1),x,y);
-                case Parser::Operation::SUB:
-                    return eval(expr.getChildren().at(0),x,y) - eval(expr.getChildren().at(1),x,y);
-                case Parser::Operation::MUL:
-                    return eval(expr.getChildren().at(0),x,y) * eval(expr.getChildren().at(1),x,y);
-                case Parser::Operation::DIV:
-                    return eval(expr.getChildren().at(0),x,y) / eval(expr.getChildren().at(1),x,y);
-                case Parser::Operation::POS:
-                    return eval(expr.getChildren().at(0),x,y);
-                case Parser::Operation::NEG:
-                    return -eval(expr.getChildren().at(0),x,y);
-                case Parser::Operation::EXP:
-                    return powf(eval(expr.getChildren().at(0),x,y), eval(expr.getChildren().at(1),x,y));
-                case Parser::Operation::SQRT:
-                    return powf(eval(expr.getChildren().at(1),x,y), 1.0f/eval(expr.getChildren().at(0),x,y));
-                case Parser::Operation::FACT:
-                    return std::tgamma(1+eval(expr.getChildren().at(0),x,y));
-            }
-            return 0; // TODO: account for more things
-        }
+        return new ImplicitEquation(displaySettings, expr);
     }
 
     Equation* Equation::createFromString(DisplaySettings settings, std::string str) {
@@ -114,5 +77,22 @@ namespace Cubiq {
     EmptyEquation::EmptyEquation(DisplaySettings settings) : Equation(settings) {}
     unsigned long EmptyEquation::getNumVertices(BoundingBox boundingBox, double precision) const {return 0;}
     void EmptyEquation::writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const {}
+
+    unsigned long EquationWrapper::getNumVertices(BoundingBox boundingBox, double precision) const {return inner->getNumVertices(boundingBox, precision);}
+    void EquationWrapper::writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const {inner->writeVertices(vertices,boundingBox, precision);}
+
+
+    EquationWrapper::EquationWrapper(Equation* eq) {
+        inner = eq;
+    }
+
+    Equation* EquationWrapper::getEquation() const {
+        return inner;
+    }
+    void EquationWrapper::setEquation(Equation* eq) {
+        Equation* temp = inner;
+        inner = eq;
+        delete temp;
+    }
 
 }

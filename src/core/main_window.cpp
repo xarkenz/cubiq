@@ -3,7 +3,8 @@
 #include <iostream>
 
 #include "main_window.h"
-#include "../equations/function.h"
+#include "equations/function.h"
+#include "equations/implicit_equation.h"
 #include "parser/interpreter.h"
 
 
@@ -13,7 +14,6 @@ namespace Cubiq {
             graphView(new GraphView(this, new Graph())),
             equationDock(new QDockWidget(tr("Equations"), this)),
             equationList(new QListWidget(equationDock)) {
-        std::cout << "test :(\n";
         setMinimumSize(800, 600);
         setCentralWidget(graphView);
         setWindowModified(false);
@@ -82,14 +82,14 @@ namespace Cubiq {
         setWindowModified(true);
     }
 
-    EquationInputLine::EquationInputLine(MainWindow* mainWin, Equation** equationPtr, const QString &contents, QWidget *parent) : QLineEdit(contents,parent) {
+    EquationInputLine::EquationInputLine(MainWindow* mainWin, EquationWrapper* equationPtr, const QString &contents, QWidget *parent) : QLineEdit(contents,parent) {
         mainParent = mainWin;
-        equationPointer = equationPtr;
+        equation = equationPtr;
         connect(this, &EquationInputLine::textChanged, this, &EquationInputLine::onChange);
     }
-    EquationInputLine::EquationInputLine(MainWindow* mainWin, Equation** equationPtr, QWidget *parent) : QLineEdit(parent) {
+    EquationInputLine::EquationInputLine(MainWindow* mainWin, EquationWrapper* equationPtr, QWidget *parent) : QLineEdit(parent) {
         mainParent = mainWin;
-        equationPointer = equationPtr;
+        equation = equationPtr;
     }
 
     // Reset to beginning when clicking off
@@ -101,10 +101,7 @@ namespace Cubiq {
     void EquationInputLine::onChange(const QString &text) {
         std::scoped_lock<std::mutex>(mainParent->getGraphMutex());
 
-        Equation* oldEq = *equationPointer;
-
-        *equationPointer = oldEq->setFromString(text.toStdString());
-        delete oldEq;
+        equation->setEquation(equation->getEquation()->setFromString(text.toStdString()));
         mainParent->markToUpdate();
     }
 
@@ -115,10 +112,10 @@ namespace Cubiq {
         equationList->addItem(tr("Also, this sidebar will ideally look much different when finished.\n"));
 
 
-        Equation** eq = new Equation*;
-        *eq = new EmptyEquation({0.8f, 0.3f, 0.3f, 0.9f});
-        graphView->getGraph()->addEquation(*eq);
-        auto inputLine = new EquationInputLine(this, eq,tr("y=x"));
+        EquationWrapper* eq = new EquationWrapper(new EmptyEquation({0.8f, 0.3f, 0.3f, 0.9f}));
+        graphView->getGraph()->addEquation(eq);
+        // TODO: things like 2\\sin{x} don't work, and y=2x doesn't graph
+        auto inputLine = new EquationInputLine(this, eq,tr("y = 2*\\sin{3x}+2*\\cos{1.3x}"));
         inputLine->onChange(inputLine->text());
 
         auto listItem = new QListWidgetItem();

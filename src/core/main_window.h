@@ -66,12 +66,12 @@ namespace Cubiq {
     class EquationInputLine : public QLineEdit {
         Q_OBJECT
         public:
-            EquationInputLine(MainWindow* mainWin, Equation** equationPtr, const QString &contents, QWidget *parent = nullptr);
-            EquationInputLine(MainWindow* mainWin, Equation** equationPtr, QWidget *parent = nullptr);
+            EquationInputLine(MainWindow* mainWin, EquationWrapper* equationPtr, const QString &contents, QWidget *parent = nullptr);
+            EquationInputLine(MainWindow* mainWin, EquationWrapper* equationPtr, QWidget *parent = nullptr);
 
         private:
             MainWindow* mainParent;
-            Equation** equationPointer;
+            EquationWrapper* equation;
 
             void focusOutEvent(QFocusEvent *e) override;
 

@@ -17,7 +17,7 @@ namespace Cubiq {
 
     Graph::~Graph() {
         std::scoped_lock<std::mutex> lock(mutex);
-        for (Equation* e: equationList) {
+        for (EquationWrapper* e: equationList) {
             delete e;
         }
         delete[] vertices;
@@ -103,7 +103,7 @@ namespace Cubiq {
     }
 
 
-    void Graph::addEquation(Equation*& e) {
+    void Graph::addEquation(EquationWrapper* e) {
         std::scoped_lock<std::mutex> lock(mutex);
         equationList.push_back(e);
     }

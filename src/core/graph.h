@@ -29,7 +29,7 @@ namespace Cubiq {
         Graph();
         ~Graph();
 
-        void addEquation(Equation*& e); //TODO: make it not use a reference
+        void addEquation(EquationWrapper* e);
 
         QString getName() const;
         QString getDescription() const;
@@ -44,7 +44,7 @@ namespace Cubiq {
 
         std::mutex mutex;
 
-        std::vector<Equation*> equationList;
+        std::vector<EquationWrapper*> equationList;
 
         GLfloat* vertices;
         unsigned long numVertices;

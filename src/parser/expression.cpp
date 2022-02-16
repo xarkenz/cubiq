@@ -110,6 +110,18 @@ namespace Cubiq::Parser {
                     return "(" + children[0].toString() + " ** " + children[1].toString() + ")";
                 case Operation::SQRT:
                     return "(" + children[0].toString() + "-root " + children[1].toString() + ")";
+                case Operation::SIN:
+                    return "(sin " + children[0].toString() + ")";
+                case Operation::COS:
+                    return "(cos " + children[0].toString() + ")";
+                case Operation::TAN:
+                    return "(tan " + children[0].toString() + ")";
+                case Operation::SEC:
+                    return "(sec " + children[0].toString() + ")";
+                case Operation::CSC:
+                    return "(csc " + children[0].toString() + ")";
+                case Operation::COT:
+                    return "(cot " + children[0].toString() + ")";
                 case Operation::B_AND:
                     return "(" + children[0].toString() + " & " + children[1].toString() + ")";
                 case Operation::B_OR:

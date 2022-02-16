@@ -25,6 +25,10 @@ namespace Cubiq::Parser {
         EXP, SQRT,
         FACT,
 
+        // Trigonometric
+        SIN, COS, TAN,
+        SEC, CSC, COT,
+
         // Logical
         L_NOT,
         L_AND, L_OR, L_XOR,

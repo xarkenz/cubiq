@@ -149,6 +149,7 @@ namespace Cubiq::Parser {
 
 
     TokenIterator::TokenIterator(CharStream& stream) : charStream(stream), current(Empty()) {
+        firstChar = 0;
         ++(*this);
     }
 

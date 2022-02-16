@@ -11,7 +11,7 @@ namespace Cubiq {
     class Equation {
 
     public:
-        struct DisplaySettings {
+        struct DisplaySettings { //TODO: move into EquationWrapper
             float r, g, b, a;
         };
 
@@ -33,9 +33,6 @@ namespace Cubiq {
         static Equation* createFromString(DisplaySettings settings, std::string str);
         static Equation* createFromExpression(DisplaySettings settings, Parser::Expression expr);
 
-        // TODO: move to Parser
-        static float eval(Parser::Expression expr, float x, float y);
-
     protected:
         DisplaySettings displaySettings{};
 
@@ -49,6 +46,19 @@ namespace Cubiq {
 
             unsigned long getNumVertices(BoundingBox boundingBox, double precision) const override;
             void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
+    };
+
+    class EquationWrapper { //TODO: move somewhere else
+        Equation* inner;
+
+    public:
+        EquationWrapper(Equation*);
+
+        unsigned long getNumVertices(BoundingBox boundingBox, double precision) const;
+        void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const;
+
+        Equation* getEquation() const;
+        void setEquation(Equation* eq);
     };
 
 }
