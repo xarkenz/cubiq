@@ -51,7 +51,7 @@ namespace Cubiq {
     }
 
     Equation* Equation::setFromExpression(Parser::Expression expr) {
-        if (expr.getOperation() != Parser::Operation::EQ) {
+        if (!expr.isOperation() || expr.getOperation() != Parser::Operation::EQ) {
             // TODO: Handle it not being an equality
             return new EmptyEquation(displaySettings);
         }
