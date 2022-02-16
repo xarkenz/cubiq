@@ -5,12 +5,12 @@
 
 namespace Cubiq {
 
-    ImplicitEquation::ImplicitEquation(DisplaySettings settings, float (* func)(float, float)) : Equation(settings) {
-        function = func;
+    ImplicitEquation::ImplicitEquation(DisplaySettings settings, std::function<float(float,float)> func) : Equation(settings) {
+        function = std::move(func);
     }
 
     float ImplicitEquation::apply(float x, float y) const {
-        return (*function)(x, y);
+        return function(x,y);
     }
 
     unsigned long ImplicitEquation::getNumVertices(BoundingBox boundingBox, double precision) const {

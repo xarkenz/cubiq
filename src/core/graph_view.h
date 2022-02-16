@@ -49,6 +49,8 @@ namespace Cubiq {
         void setGraph(Graph* g);
         Graph* getGraph();
 
+        void markToUpdate();
+
         void centerOrigin();
 
     protected:

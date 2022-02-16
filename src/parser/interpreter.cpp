@@ -340,7 +340,7 @@ namespace Cubiq::Parser {
                             ++it;
                         } else {
                             // Defaults to square root
-                            operandStack.emplace(context, 2, std::vector<Expression>());
+                            operandStack.emplace(context, Number(2), std::vector<Expression>());
                         }
                         if (!it->isSymbol() || it->getSymbol().name != "{")
                             throw Error{ErrorType::MISSING, "{"};

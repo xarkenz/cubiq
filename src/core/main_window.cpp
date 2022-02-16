@@ -1,8 +1,10 @@
 #include <QtWidgets>
+
 #include <iostream>
 
 #include "main_window.h"
 #include "../equations/function.h"
+#include "parser/interpreter.h"
 
 
 namespace Cubiq {
@@ -18,6 +20,10 @@ namespace Cubiq {
         createGraphView();
         createEquationList();
         updateInfo();
+    }
+
+    void MainWindow::markToUpdate() {
+        graphView->markToUpdate();
     }
 
 
@@ -41,9 +47,9 @@ namespace Cubiq {
 
         Graph* graph = graphView->getGraph();
 
-        auto testFunc1 = [](float x) -> float { return 2.0f * sinf(x * 3.0f) + 2.0f * cosf(x * 1.3f); };
+        /*auto testFunc1 = [](float x) -> float { return 2.0f * sinf(x * 3.0f) + 2.0f * cosf(x * 1.3f); };
         Equation* eq1 = new Function({0.8f, 0.3f, 0.3f, 0.9f}, Function::IndependentVariable::X, testFunc1);
-        graph->addEquation(eq1);
+        graph->addEquation(eq1);*/
 
         /*auto testFunc2 = [](float y) -> float {return y*y*y*y/16 - y*y*y*5/8 + y*y + y*2;};
         Equation* eq2 = new Function({0.2f,0.2f,0.8f,0.9f}, Function::IndependentVariable::Y, testFunc2);
@@ -72,13 +78,61 @@ namespace Cubiq {
         setWindowModified(true);
     }
 
+    EquationInputLine::EquationInputLine(MainWindow* mainWin, Equation** equationPtr, const QString &contents, QWidget *parent) : QLineEdit(contents,parent) {
+        mainParent = mainWin;
+        equationPointer = equationPtr;
+        connect(this, &EquationInputLine::textChanged, this, &EquationInputLine::onChange);
+    }
+    EquationInputLine::EquationInputLine(MainWindow* mainWin, Equation** equationPtr, QWidget *parent) : QLineEdit(parent) {
+        mainParent = mainWin;
+        equationPointer = equationPtr;
+    }
+
+    // Reset to beginning when clicking off
+    void EquationInputLine::focusOutEvent(QFocusEvent *e) {
+        setCursorPosition(0);
+        QLineEdit::focusOutEvent(e);
+    }
+
+    void EquationInputLine::onChange(const QString &text) {
+        Equation* newEq = (*equationPointer)->setFromString(text.toStdString());
+        std::cout << newEq->getDisplaySettings().r << std::endl;
+        /*delete (*equationPointer);
+        *equationPointer = newEq;
+        mainParent->markToUpdate();*/
+    }
 
     void MainWindow::createEquationList() {
         equationDock->setWidget(equationList);
         equationList->setWordWrap(true);
-        equationList->addItem(tr("A lot more needs to be finished before there can be anything interesting here."));
-        equationList->addItem(tr("\nAlso, this sidebar will ideally look much different when finished."));
+        equationList->addItem(tr("A lot more needs to be finished before there can be anything interesting here.\n"));
+        equationList->addItem(tr("Also, this sidebar will ideally look much different when finished.\n"));
+
+
+        Equation* eq = new EmptyEquation({0.8f, 0.3f, 0.3f, 0.9f});
+        graphView->getGraph()->addEquation(eq);
+        auto inputLine = new EquationInputLine(this, &eq,tr("y=x"));
+        inputLine->onChange(inputLine->text());
+
+        auto listItem = new QListWidgetItem();
+        auto widget = new QWidget();
+        auto layout = new QHBoxLayout();
+        auto label = new QLabel(tr("Equation: "));
+        label->setProperty("listLabel", "true");
+        inputLine->setCursorPosition(0);
+
+        layout->addWidget(label);
+        layout->addWidget(inputLine);
+        layout->addStretch();
+        layout->setSizeConstraint(QLayout::SetFixedSize);
+        widget->setLayout(layout);
+        listItem->setSizeHint(widget->sizeHint());
+
+        equationList->addItem(listItem);
+        equationList->setItemWidget(listItem,widget);
+
         addDockWidget(Qt::LeftDockWidgetArea, equationDock);
+
     }
 
 

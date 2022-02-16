@@ -43,7 +43,7 @@ endif()
 
 qt5_add_resources(RESOURCES resources.qrc)
 
-file(GLOB SOURCES src/*.cpp src/core/*.cpp src/equations/*.cpp)
+file(GLOB SOURCES src/*.cpp src/core/*.cpp src/equations/*.cpp src/parser/*.cpp)
 
 include_directories(BEFORE src)
 add_executable(cubiq ${RESOURCES} ${SOURCES})

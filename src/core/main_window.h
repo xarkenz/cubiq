@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QListWidget>
+#include <QLineEdit>
 
 #include "core/graph_view.h"
 #include "core/settings_dialog.h"
@@ -14,6 +15,8 @@ namespace Cubiq {
 
     public:
         MainWindow();
+
+        void markToUpdate();
 
     private:
         GraphView* graphView;
@@ -30,6 +33,7 @@ namespace Cubiq {
         void createTopBar();
 
         bool checkUnsavedChanges();
+
 
     protected:
         void closeEvent(QCloseEvent* event) override;
@@ -54,6 +58,23 @@ namespace Cubiq {
 
         void updateInfo();
 
+    };
+
+    // TODO: move this
+    class EquationInputLine : public QLineEdit {
+        Q_OBJECT
+        public:
+            EquationInputLine(MainWindow* mainWin, Equation** equationPtr, const QString &contents, QWidget *parent = nullptr);
+            EquationInputLine(MainWindow* mainWin, Equation** equationPtr, QWidget *parent = nullptr);
+
+        private:
+            MainWindow* mainParent;
+            Equation** equationPointer;
+
+            void focusOutEvent(QFocusEvent *e) override;
+
+        public slots:
+            void onChange(const QString &text);
     };
 
 }

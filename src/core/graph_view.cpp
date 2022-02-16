@@ -442,4 +442,8 @@ namespace Cubiq {
         graph = g;
     }
 
+    void GraphView::markToUpdate() {
+        calculationThread.markToUpdate();
+    }
+
 }

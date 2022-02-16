@@ -66,6 +66,19 @@ QListWidget {
     padding: 8px;
 }
 
+QLabel[listLabel="true"] {
+    border: none;
+    color: #ddd;
+    background: transparent;
+
+}
+
+QLineEdit {
+    background: #CCC;
+    border: 2px solid #888;
+    border-radius: 4px;
+    color: #111;
+}
 
 QMainWindow {
     background: #444;

@@ -103,7 +103,7 @@ namespace Cubiq {
     }
 
 
-    void Graph::addEquation(Equation* e) {
+    void Graph::addEquation(Equation*& e) {
         std::scoped_lock<std::mutex> lock(mutex);
         equationList.push_back(e);
     }

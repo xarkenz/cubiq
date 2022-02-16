@@ -5,15 +5,15 @@
 
 namespace Cubiq {
 
-    Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, float (* func)(float)) : Equation(
+    Function::Function(DisplaySettings settings, Function::IndependentVariable inVar, std::function<float(float)> func) : Equation(
             settings) {
         inputVar = inVar;
-        function = func;
+        function = std::move(func);
     }
 
 
     float Function::apply(float input) const {
-        return (*function)(input);
+        return function(input);
     }
 
 

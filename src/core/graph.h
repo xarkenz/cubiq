@@ -29,7 +29,7 @@ namespace Cubiq {
         Graph();
         ~Graph();
 
-        void addEquation(Equation* e);
+        void addEquation(Equation*& e); //TODO: make it not use a reference
 
         QString getName() const;
         QString getDescription() const;

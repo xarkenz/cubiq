@@ -12,7 +12,7 @@ namespace Cubiq {
             X, Y
         };
 
-        Function(DisplaySettings settings, IndependentVariable inVar, float (* func)(float));
+        Function(DisplaySettings settings, IndependentVariable inVar, std::function<float(float)> func);
 
         unsigned long getNumVertices(BoundingBox boundingBox, double precision) const override;
         void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
@@ -21,7 +21,7 @@ namespace Cubiq {
 
     private:
         IndependentVariable inputVar;
-        float (* function)(float);
+        std::function<float(float)> function;
 
     };
 

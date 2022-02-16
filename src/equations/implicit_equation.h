@@ -8,7 +8,7 @@ namespace Cubiq {
     class ImplicitEquation : public Equation {
 
     public:
-        ImplicitEquation(DisplaySettings settings, float (* func)(float, float));
+        ImplicitEquation(DisplaySettings settings, std::function<float(float,float)>);
 
         float apply(float x, float y) const; // Function drawn where apply(x,y)=0
 
@@ -16,7 +16,7 @@ namespace Cubiq {
         void writeVertices(GLfloat* vertices, BoundingBox boundingBox, double precision) const override;
 
     private:
-        float (* function)(float, float);
+        std::function<float(float,float)> function;
 
     };
 
