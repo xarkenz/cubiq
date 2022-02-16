@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
     parser.process(app);
-
     Cubiq::MainWindow mainWin;
     mainWin.showMaximized();
 

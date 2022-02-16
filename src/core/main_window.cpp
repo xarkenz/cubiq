@@ -13,6 +13,7 @@ namespace Cubiq {
             graphView(new GraphView(this, new Graph())),
             equationDock(new QDockWidget(tr("Equations"), this)),
             equationList(new QListWidget(equationDock)) {
+        std::cout << "test :(\n";
         setMinimumSize(800, 600);
         setCentralWidget(graphView);
         setWindowModified(false);
@@ -26,6 +27,9 @@ namespace Cubiq {
         graphView->markToUpdate();
     }
 
+    std::mutex& MainWindow::getGraphMutex() {
+        return graphView->getGraph()->getMutex();
+    }
 
     QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut,
                                       const char* toolTip) {
@@ -95,11 +99,13 @@ namespace Cubiq {
     }
 
     void EquationInputLine::onChange(const QString &text) {
-        Equation* newEq = (*equationPointer)->setFromString(text.toStdString());
-        std::cout << newEq->getDisplaySettings().r << std::endl;
-        /*delete (*equationPointer);
-        *equationPointer = newEq;
-        mainParent->markToUpdate();*/
+        std::scoped_lock<std::mutex>(mainParent->getGraphMutex());
+
+        Equation* oldEq = *equationPointer;
+
+        *equationPointer = oldEq->setFromString(text.toStdString());
+        delete oldEq;
+        mainParent->markToUpdate();
     }
 
     void MainWindow::createEquationList() {
@@ -109,9 +115,10 @@ namespace Cubiq {
         equationList->addItem(tr("Also, this sidebar will ideally look much different when finished.\n"));
 
 
-        Equation* eq = new EmptyEquation({0.8f, 0.3f, 0.3f, 0.9f});
-        graphView->getGraph()->addEquation(eq);
-        auto inputLine = new EquationInputLine(this, &eq,tr("y=x"));
+        Equation** eq = new Equation*;
+        *eq = new EmptyEquation({0.8f, 0.3f, 0.3f, 0.9f});
+        graphView->getGraph()->addEquation(*eq);
+        auto inputLine = new EquationInputLine(this, eq,tr("y=x"));
         inputLine->onChange(inputLine->text());
 
         auto listItem = new QListWidgetItem();

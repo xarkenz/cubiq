@@ -18,6 +18,8 @@ namespace Cubiq {
 
         void markToUpdate();
 
+        std::mutex& getGraphMutex();
+
     private:
         GraphView* graphView;
         QDockWidget* equationDock;
