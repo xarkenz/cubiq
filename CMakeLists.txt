@@ -23,7 +23,7 @@ if(APPLE)
 elseif(UNIX)
 	set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu")
 elseif (WIN32)
-	set(CMAKE_PREFIX_PATH "C:/Qt/Qt-5.12.12")
+	set(CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)

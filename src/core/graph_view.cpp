@@ -361,9 +361,10 @@ namespace Cubiq {
         glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
         if (status == GL_FALSE) {
             glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
-            char infoLog[infoLogLength];
+            char* infoLog = new char[infoLogLength];
             glGetShaderInfoLog(vertexShader, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Compile fragment shader
@@ -373,9 +374,10 @@ namespace Cubiq {
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
         if (status == GL_FALSE) {
             glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
-            char infoLog[infoLogLength];
+            char* infoLog = new char[infoLogLength];
             glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Create and link program
@@ -392,9 +394,10 @@ namespace Cubiq {
         glGetProgramiv(program, GL_LINK_STATUS, &status);
         if (status == GL_FALSE) {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
-            char infoLog[infoLogLength];
+            char* infoLog = new char[infoLogLength];
             glGetProgramInfoLog(program, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Clean up after ourselves
