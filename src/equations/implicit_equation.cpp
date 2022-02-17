@@ -69,6 +69,7 @@ namespace Cubiq {
                     return 0; // TODO: account for more things
             }
         }
+        return 0;
     }
 
     unsigned long ImplicitEquation::getNumVertices(BoundingBox boundingBox, double precision) const {
