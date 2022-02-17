@@ -364,6 +364,7 @@ namespace Cubiq {
             char* infoLog = new char[infoLogLength];
             glGetShaderInfoLog(vertexShader, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Compile fragment shader
@@ -376,6 +377,7 @@ namespace Cubiq {
             char* infoLog = new char[infoLogLength];
             glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Create and link program
@@ -395,6 +397,7 @@ namespace Cubiq {
             char* infoLog = new char[infoLogLength];
             glGetProgramInfoLog(program, infoLogLength, NULL, infoLog);
             std::cerr << infoLog << std::endl;
+            delete[] infoLog;
         }
 
         // Clean up after ourselves
