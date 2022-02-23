@@ -17,23 +17,13 @@ namespace Cubiq {
     const GLsizei VERTEX_BYTES = 7 * sizeof(GLfloat);
 
 
-    GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent), calculationThread(this, g) {
-        graph = g;
-
-        clearR = 0.133f;
-        clearG = 0.133f;
-        clearB = 0.133f;
-
-        screenW = 0;
-        screenH = 0;
-
-        dragStartBounds = {0, 0, 0, 0};
-        dragging = false;
-
-        gridSpaceX = 1.0f;
-        gridSpaceY = 1.0f;
-        gridMajorX = 5;
-        gridMajorY = 5;
+    GraphView::GraphView(QWidget* parent, Graph* g) :
+            QOpenGLWidget(parent),
+            calculationThread(this, g), graph(g),
+            dragging(false), dragStartBounds{0, 0, 0, 0},
+            clearR(0.133f), clearG(0.133f), clearB(0.133f),
+            screenW(0), screenH(0),
+            gridSpaceX(1), gridSpaceY(1), gridMajorX(5), gridMajorY(5) {
     }
 
     GraphView::~GraphView() {
@@ -150,52 +140,55 @@ namespace Cubiq {
     void GraphView::drawGrid() {
         const float aspect = (float) screenH / (float) screenW;
 
+        const BoundingBox& bounds = graph->getBoundingBox();
+
         const float minorAlpha = 0.05f;
         const float majorAlpha = 0.2f;
         const float axisAlpha = 0.5f;
 
         GLfloat axes[] = {
-                0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, axisAlpha,
-                0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, axisAlpha,
-                graph->getBoundingBox().minX, 0, 0, 1, 1, 1, axisAlpha,
-                graph->getBoundingBox().maxX, 0, 0, 1, 1, 1, axisAlpha,
+                0, bounds.centerY() - bounds.height() * aspect, 0, 1, 1, 1, axisAlpha,
+                0, bounds.centerY() + bounds.height() * aspect, 0, 1, 1, 1, axisAlpha,
+                bounds.minX, 0, 0, 1, 1, 1, axisAlpha,
+                bounds.maxX, 0, 0, 1, 1, 1, axisAlpha,
         };
         glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * VERTEX_BYTES, axes);
 
         int index = 4;
 
-        for (float x = std::floor(graph->getBoundingBox().minX / gridSpaceX) * gridSpaceX;
-             x <= std::ceil(graph->getBoundingBox().maxX / gridSpaceX) * gridSpaceX;
-             x += gridSpaceX) {
+        for (float x = std::floor(bounds.minX / gridSpaceX) * gridSpaceX;
+                x <= std::ceil(bounds.maxX / gridSpaceX) * gridSpaceX;
+                x += gridSpaceX) {
             if (x != 0) {
                 float alpha = (int) std::round(x / gridSpaceX) % gridMajorX == 0 ? majorAlpha : minorAlpha;
                 GLfloat line[] = {
-                        x, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, alpha,
-                        x, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, alpha,
+                        x, bounds.centerY() - bounds.height() * aspect, 0, 1, 1, 1, alpha,
+                        x, bounds.centerY() + bounds.height() * aspect, 0, 1, 1, 1, alpha,
                 };
                 glBufferSubData(GL_ARRAY_BUFFER, index * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
                 index += 2;
             }
         }
 
-        for (float y =
-                std::floor((graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect) / gridSpaceY) * gridSpaceY;
-             y <= std::ceil((graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect) / gridSpaceY) * gridSpaceY;
-             y += gridSpaceY) {
+        for (float y = std::floor((bounds.centerY() - bounds.height() * aspect) / gridSpaceY) * gridSpaceY;
+                y <= std::ceil((bounds.centerY() + bounds.height() * aspect) / gridSpaceY) * gridSpaceY;
+                y += gridSpaceY) {
             if (y != 0) {
                 float alpha = (int) std::round(y / gridSpaceY) % gridMajorY == 0 ? majorAlpha : minorAlpha;
                 GLfloat line[] = {
-                        graph->getBoundingBox().minX, y, 0, 1, 1, 1, alpha,
-                        graph->getBoundingBox().maxX, y, 0, 1, 1, 1, alpha,
+                        bounds.minX, y, 0, 1, 1, 1, alpha,
+                        bounds.maxX, y, 0, 1, 1, 1, alpha,
                 };
                 glBufferSubData(GL_ARRAY_BUFFER, index * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
                 index += 2;
             }
         }
 
+        // Draw regular grid [4, index)
         glLineWidth(1);
         glDrawArrays(GL_LINES, 4, index - 4);
 
+        // Draw grid axes on top [0, 4)
         glLineWidth(2);
         glDrawArrays(GL_LINES, 0, 4);
     }
@@ -206,7 +199,7 @@ namespace Cubiq {
         std::scoped_lock<std::mutex> lock(graph->getMutex());
 
         unsigned long numVerts;
-        unsigned int count;
+        GLsizei count;
         GLfloat* vertices = graph->getVertexList(numVerts);
 
         if (numVerts == 0) { return; }

@@ -43,7 +43,6 @@ namespace Cubiq {
         static const int BATCH_SIZE;
 
         GraphView(QWidget* parent, Graph* g);
-
         ~GraphView();
 
         void setGraph(Graph* g);
