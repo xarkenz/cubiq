@@ -20,17 +20,20 @@ namespace Cubiq {
     GraphView::GraphView(QWidget* parent, Graph* g) : QOpenGLWidget(parent), calculationThread(this, g) {
         graph = g;
 
-        clearR = .1f;
-        clearG = .1f;
-        clearB = .1f;
+        clearR = 0.133f;
+        clearG = 0.133f;
+        clearB = 0.133f;
 
         screenW = 0;
         screenH = 0;
 
-        bufferIndex = 0;
-
         dragStartBounds = {0, 0, 0, 0};
         dragging = false;
+
+        gridSpaceX = 1.0f;
+        gridSpaceY = 1.0f;
+        gridMajorX = 5;
+        gridMajorY = 5;
     }
 
     GraphView::~GraphView() {
@@ -130,7 +133,6 @@ namespace Cubiq {
         glBufferData(GL_ARRAY_BUFFER, BATCH_SIZE * VERTEX_BYTES, NULL, GL_DYNAMIC_DRAW);
 
         // Load geometry onto the buffer and draw
-        bufferIndex = 0;
         drawGrid();
         drawElements();
 
@@ -146,66 +148,60 @@ namespace Cubiq {
 
 
     void GraphView::drawGrid() {
-        const float aspect = (float) screenH / screenW;
-        GLint first = bufferIndex;
+        const float aspect = (float) screenH / (float) screenW;
 
-        const float c1 = 0.2f;
-        const float c2 = 0.6f;
-        const float c3 = 0.8f;
+        const float minorAlpha = 0.05f;
+        const float majorAlpha = 0.2f;
+        const float axisAlpha = 0.5f;
 
-        const float spaceX = 1;
-        const float spaceY = 1;
+        GLfloat axes[] = {
+                0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, axisAlpha,
+                0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, axisAlpha,
+                graph->getBoundingBox().minX, 0, 0, 1, 1, 1, axisAlpha,
+                graph->getBoundingBox().maxX, 0, 0, 1, 1, 1, axisAlpha,
+        };
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * VERTEX_BYTES, axes);
 
-        for (float x = std::floor(graph->getBoundingBox().minX / spaceX) * spaceX;
-             x <= std::ceil(graph->getBoundingBox().maxX / spaceX) * spaceX;
-             x += spaceX) {
+        int index = 4;
+
+        for (float x = std::floor(graph->getBoundingBox().minX / gridSpaceX) * gridSpaceX;
+             x <= std::ceil(graph->getBoundingBox().maxX / gridSpaceX) * gridSpaceX;
+             x += gridSpaceX) {
             if (x != 0) {
-                float c = (int) (x / spaceX) % 4 == 0 ? c2 : c1;
+                float alpha = (int) std::round(x / gridSpaceX) % gridMajorX == 0 ? majorAlpha : minorAlpha;
                 GLfloat line[] = {
-                        x, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c,
-                        x, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c,
+                        x, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, alpha,
+                        x, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, alpha,
                 };
-                glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
-                bufferIndex += 2;
+                glBufferSubData(GL_ARRAY_BUFFER, index * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
+                index += 2;
             }
         }
 
         for (float y =
-                std::floor((graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect) / spaceY) *
-                spaceY;
-             y <= std::ceil((graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect) / spaceY) *
-                  spaceY;
-             y += spaceY) {
+                std::floor((graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect) / gridSpaceY) * gridSpaceY;
+             y <= std::ceil((graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect) / gridSpaceY) * gridSpaceY;
+             y += gridSpaceY) {
             if (y != 0) {
-                float c = (int) (y / spaceY) % 4 == 0 ? c2 : c1;
+                float alpha = (int) std::round(y / gridSpaceY) % gridMajorY == 0 ? majorAlpha : minorAlpha;
                 GLfloat line[] = {
-                        graph->getBoundingBox().minX, y, 0, 1, 1, 1, c,
-                        graph->getBoundingBox().maxX, y, 0, 1, 1, 1, c,
+                        graph->getBoundingBox().minX, y, 0, 1, 1, 1, alpha,
+                        graph->getBoundingBox().maxX, y, 0, 1, 1, 1, alpha,
                 };
-                glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
-                bufferIndex += 2;
+                glBufferSubData(GL_ARRAY_BUFFER, index * VERTEX_BYTES, 2 * VERTEX_BYTES, line);
+                index += 2;
             }
         }
 
         glLineWidth(1);
-        glDrawArrays(GL_LINES, first, bufferIndex - first);
+        glDrawArrays(GL_LINES, 4, index - 4);
 
-        GLfloat axes[] = {
-                0, graph->getBoundingBox().centerY() - graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c3,
-                0, graph->getBoundingBox().centerY() + graph->getBoundingBox().height() * aspect, 0, 1, 1, 1, c3,
-                graph->getBoundingBox().minX, 0, 0, 1, 1, 1, c3,
-                graph->getBoundingBox().maxX, 0, 0, 1, 1, 1, c3,
-        };
-        glBufferSubData(GL_ARRAY_BUFFER, bufferIndex * VERTEX_BYTES, 4 * VERTEX_BYTES, axes);
         glLineWidth(2);
-        glDrawArrays(GL_LINES, bufferIndex, 4);
-        bufferIndex += 4;
+        glDrawArrays(GL_LINES, 0, 4);
     }
 
 
     void GraphView::drawElements() {
-        bufferIndex = 0; // "Clear" the buffer
-
         // Lock the graph's mutex while drawing
         std::scoped_lock<std::mutex> lock(graph->getMutex());
 
@@ -316,6 +312,20 @@ namespace Cubiq {
         view.lookAt(viewEye, viewCenter, viewUp);
 
         projection *= view;
+
+        // Adjust grid spacing
+        while (gridSpaceX * (float) screenW / graph->getBoundingBox().width() > 50.0f) {
+            gridStepDown(gridSpaceX, gridMajorX);
+        }
+        while (gridSpaceX * (float) screenW / graph->getBoundingBox().width() < 20.0f) {
+            gridStepUp(gridSpaceX, gridMajorX);
+        }
+        while (gridSpaceY * (float) screenH / (graph->getBoundingBox().height() * aspect) > 50.0f) {
+            gridStepDown(gridSpaceY, gridMajorY);
+        }
+        while (gridSpaceY * (float) screenH / (graph->getBoundingBox().height() * aspect) < 20.0f) {
+            gridStepUp(gridSpaceY, gridMajorY);
+        }
     }
 
 
@@ -324,9 +334,9 @@ namespace Cubiq {
 
         // Determine system GLSL version
         std::string glslVersionStr((char*) glGetString(GL_SHADING_LANGUAGE_VERSION));
-        std::string glslVersionID;
 
         // Convert version string to number compatible with #version directive
+        std::string glslVersionID;
         for (char c : glslVersionStr) {
             if (std::isdigit(c)) {
                 glslVersionID += c;
@@ -405,6 +415,48 @@ namespace Cubiq {
         glDeleteShader(fragmentShader);
 
         return program;
+    }
+
+
+    void GraphView::gridStepUp(float& space, int& major) {
+        int base = (int) (space / std::pow(10, (int) std::floor(std::log10(space))));
+        switch (base) {
+            case 1:
+            case 5:
+                space *= 2.0f;
+                major = 5;
+                break;
+            case 2:
+                space *= 2.5f;
+                major = 4;
+                break;
+            default:
+                space = 1.0f;
+                major = 5;
+                break;
+        }
+    }
+
+    void GraphView::gridStepDown(float& space, int& major) {
+        int base = (int) (space / std::pow(10, (int) std::floor(std::log10(space))));
+        switch (base) {
+            case 1:
+                space *= 0.5f;
+                major = 4;
+                break;
+            case 2:
+                space *= 0.5f;
+                major = 5;
+                break;
+            case 5:
+                space *= 0.4f;
+                major = 5;
+                break;
+            default:
+                space = 1.0f;
+                major = 5;
+                break;
+        }
     }
 
 

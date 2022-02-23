@@ -20,13 +20,10 @@ namespace Cubiq {
         QDockWidget* equationDock;
         QListWidget* equationList;
 
-        QAction*
-        createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip);
+        QAction* createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip);
 
         void createGraphView();
-
         void createEquationList();
-
         void createTopBar();
 
         bool checkUnsavedChanges();
@@ -37,20 +34,17 @@ namespace Cubiq {
     public slots:
 
         void handleNew();
-
         void handleOpen();
-
         bool handleSave();
-
         bool handleSaveAs();
-
         void handleSettings();
 
         void handleCopy();
-
         void handleCut();
 
         void handleOrigin();
+
+        void handleAbout();
 
         void updateInfo();
 

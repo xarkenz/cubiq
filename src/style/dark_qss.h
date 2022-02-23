@@ -89,6 +89,7 @@ QToolBar {
     background: #444;
     border: none;
     color: #ddd;
+    padding: 2px;
 }
 
 QToolBar::separator {

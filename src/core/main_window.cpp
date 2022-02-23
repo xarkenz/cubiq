@@ -76,8 +76,7 @@ namespace Cubiq {
     void MainWindow::createEquationList() {
         equationDock->setWidget(equationList);
         equationList->setWordWrap(true);
-        equationList->addItem(tr("A lot more needs to be finished before there can be anything interesting here."));
-        equationList->addItem(tr("\nAlso, this sidebar will ideally look much different when finished."));
+        equationList->addItem(tr("Cooper is working on this part right now. So... this will have to do for the moment."));
         addDockWidget(Qt::LeftDockWidgetArea, equationDock);
     }
 
@@ -87,18 +86,15 @@ namespace Cubiq {
         QAction* aNew = createAction("new", "New", SLOT(handleNew()), "Ctrl+N", "Create a new graph.");
         QAction* aOpen = createAction("open", "Open...", SLOT(handleOpen()), "Ctrl+O", "Open a graph from file.");
         QAction* aSave = createAction("save", "Save", SLOT(handleSave()), "Ctrl+S", "Save the current graph.");
-        QAction* aSaveAs = createAction("saveas", "Save as...", SLOT(handleSaveAs()), "Ctrl+Shift+S",
-                                        "Save the graph under a new name.");
-        QAction* aSettings = createAction("settings", "Settings...", SLOT(handleSettings()), "Ctrl+Alt+S",
-                                          "Configure the look and feel of the program.");
+        QAction* aSaveAs = createAction("saveas", "Save as...", SLOT(handleSaveAs()), "Ctrl+Shift+S", "Save the graph under a new name.");
+        QAction* aSettings = createAction("settings", "Settings...", SLOT(handleSettings()), "Ctrl+Alt+S", "Configure the look and feel of the program.");
 
-        QAction* aCopy = createAction("copy", "Copy", SLOT(handleCopy()), "Ctrl+C",
-                                      "Copy the current selection to clipboard.");
-        QAction* aCut = createAction("cut", "Cut", SLOT(handleCut()), "Ctrl+X",
-                                     "Cut the current selection to clipboard.");
+        QAction* aCopy = createAction("copy", "Copy", SLOT(handleCopy()), "Ctrl+C", "Copy the current selection to clipboard.");
+        QAction* aCut = createAction("cut", "Cut", SLOT(handleCut()), "Ctrl+X", "Cut the current selection to clipboard.");
 
-        QAction* aOrigin = createAction("origin", "Return to Origin", SLOT(handleOrigin()), "Ctrl+.",
-                                        "Center the view on (0, 0).");
+        QAction* aOrigin = createAction("origin", "Return to Origin", SLOT(handleOrigin()), "Ctrl+.", "Center the view on (0, 0).");
+
+        QAction* aAbout = createAction("about", "About Cubiq...", SLOT(handleAbout()), "", "More information about this program.");
 
         // Create menus and add respective actions
         QMenu* mFile = menuBar()->addMenu("File");
@@ -119,6 +115,7 @@ namespace Cubiq {
         QMenu* mWindow = menuBar()->addMenu("Window");
 
         QMenu* mHelp = menuBar()->addMenu("Help");
+        mHelp->addAction(aAbout);
 
         // Create quick action toolbar
         QToolBar* toolBar = addToolBar("Quick Actions");
@@ -140,11 +137,8 @@ namespace Cubiq {
         auto* spacer = new QWidget;
         spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         toolBar->addWidget(spacer);
-
-        auto* cornerIcon = new QLabel;
-        cornerIcon->setPixmap(QIcon(":/icons/cubiq_base").pixmap(toolBar->iconSize()));
-        cornerIcon->setStyleSheet("padding-right: 10px;");
-        toolBar->addWidget(cornerIcon);
+        toolBar->addAction(aAbout);
+        toolBar->widgetForAction(aAbout)->setStyleSheet("margin-right: 6px;");
     }
 
 
@@ -219,6 +213,10 @@ namespace Cubiq {
 
     void MainWindow::handleOrigin() {
         graphView->centerOrigin();
+    }
+
+    void MainWindow::handleAbout() {
+        // About
     }
 
 

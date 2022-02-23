@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
-    <!-- There's probably a better way to do this... -->
+    <!-- TODO: Is there a way to add these automatically? -->
     <qresource prefix="/icons">
+        <file alias="about">assets/icons/about.svg</file>
         <file alias="copy">assets/icons/copy.svg</file>
         <file alias="cut">assets/icons/cut.svg</file>
         <file alias="cubiq_base">assets/icons/cubiq_base.svg</file>

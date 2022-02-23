@@ -67,8 +67,10 @@ namespace Cubiq {
         void zoom(float steps, QPointF pos);
         void adjustCamera();
 
-        GLuint
-        createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);
+        GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);
+
+        static void gridStepUp(float& space, int& major);
+        static void gridStepDown(float& space, int& major);
 
     private:
         float clearR, clearG, clearB;
@@ -83,11 +85,12 @@ namespace Cubiq {
         GLuint vertexArray{};
         GLuint vertexBuffer{};
 
-        GLint bufferIndex;
-
         QPoint dragStartPos;
         BoundingBox dragStartBounds;
         bool dragging;
+
+        float gridSpaceX, gridSpaceY;
+        int gridMajorX, gridMajorY;
 
     };
 
