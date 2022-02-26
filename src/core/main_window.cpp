@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QtSvg>
 #include <iostream>
 
 #include "main_window.h"
@@ -21,8 +22,7 @@ namespace Cubiq {
     }
 
 
-    QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut,
-                                      const char* toolTip) {
+    QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip) {
         std::string iconFile(":/icons/");
         iconFile += name;
         auto* action = new QAction(QIcon(iconFile.c_str()), tr(text), this);
@@ -74,9 +74,15 @@ namespace Cubiq {
 
 
     void MainWindow::createEquationList() {
+        // TODO: why does animated svg not work :(
+        /*auto* loadingIcon = new QSvgWidget(":/icons/loading", equationDock);
+        equationDock->setWidget(loadingIcon);
+        std::cout << loadingIcon->renderer()->animated() << std::endl;
+        loadingIcon->setMaximumSize(64, 64);
+        loadingIcon->renderer()->setFramesPerSecond(30);*/
         equationDock->setWidget(equationList);
         equationList->setWordWrap(true);
-        equationList->addItem(tr("Cooper is working on this part right now. So... this will have to do for the moment."));
+        equationList->addItem(tr("There's nothing here yet. Divert your eyes."));
         addDockWidget(Qt::LeftDockWidgetArea, equationDock);
     }
 

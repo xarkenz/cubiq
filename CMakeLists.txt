@@ -33,7 +33,7 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")	 # Needed for threading on some systems
 
-find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets Svg REQUIRED)
 find_package(OpenMP REQUIRED)
 
 if (OPENMP_FOUND AND APPLE)
@@ -47,5 +47,5 @@ file(GLOB SOURCES src/*.cpp src/core/*.cpp src/equations/*.cpp)
 
 include_directories(BEFORE src)
 add_executable(cubiq ${RESOURCES} ${SOURCES})
-target_link_libraries(cubiq PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets)
+target_link_libraries(cubiq PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Svg)
 target_link_libraries(cubiq PUBLIC OpenMP::OpenMP_CXX)

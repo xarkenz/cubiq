@@ -1,0 +1,28 @@
+<svg version="1.1" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+    <g fill-rule="evenodd" fill="#ff9421">
+        <path d="M 16 0 L 2 8 L 16 16">
+            <animate attributeName="d" begin="0s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 16 0 L 2 8 L 16 16; M 2 8 L 16 0 L 16 16; M 2 8 L 16 0 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+        <path d="M 2 8 L 2 24 L 16 16">
+            <animate attributeName="d" begin="0.125s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 2 8 L 2 24 L 16 16; M 2 24 L 2 8 L 16 16; M 2 24 L 2 8 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0.125s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+        <path d="M 2 24 L 16 32 L 16 16">
+            <animate attributeName="d" begin="0.25s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 2 24 L 16 32 L 16 16; M 16 32 L 2 24 L 16 16; M 16 32 L 2 24 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0.25s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+        <path d="M 16 32 L 30 24 L 16 16">
+            <animate attributeName="d" begin="0.375s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 16 32 L 30 24 L 16 16; M 30 24 L 16 32 L 16 16; M 30 24 L 16 32 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0.375s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+        <path d="M 30 24 L 30 8 L 16 16">
+            <animate attributeName="d" begin="0.5s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 30 24 L 30 8 L 16 16; M 30 8 L 30 24 L 16 16; M 30 8 L 30 24 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0.5s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+        <path d="M 30 8 L 16 0 L 16 16">
+            <animate attributeName="d" begin="0.625s" dur="1s" repeatCount="indefinite" calcMode="spline" values="M 30 8 L 16 0 L 16 16; M 16 0 L 30 8 L 16 16; M 16 0 L 30 8 L 16 16" keyTimes="0; 0.25; 1" keySplines="0.5 0 0.5 1; 0 0 1 1"/>
+            <animate attributeName="fill" begin="0.625s" dur="1s" repeatCount="indefinite" calcMode="spline" values="#ff9421; #ffef72; #ff9421; #ff9421" keyTimes="0; 0.125; 0.625; 1" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1; 0 0 1 1"/>
+        </path>
+    </g>
+</svg>

@@ -19,7 +19,6 @@ QDockWidget {
 QDockWidget::title {
     background: #444;
     border: none;
-    border-top: 2px solid #666;
     color: #ddd;
     padding: 6px;
     text-align: left;
@@ -88,6 +87,7 @@ QMainWindow::separator:hover {
 QToolBar {
     background: #444;
     border: none;
+    border-bottom: 2px solid #666;
     color: #ddd;
     padding: 2px;
 }
@@ -104,7 +104,7 @@ QToolButton {
     border: none;
     border-radius: 4px;
     color: #ddd;
-    margin: 2px;
+    margin: 2px 2px 3px 2px;
     padding: 4px;
 }
 

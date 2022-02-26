@@ -6,6 +6,7 @@
         <file alias="cut">assets/icons/cut.svg</file>
         <file alias="cubiq_base">assets/icons/cubiq_base.svg</file>
         <file alias="cubiq_bg">assets/icons/cubiq_bg.svg</file>
+        <file alias="loading">assets/icons/loading.svg</file>
         <file alias="new">assets/icons/new.svg</file>
         <file alias="open">assets/icons/open.svg</file>
         <file alias="origin">assets/icons/origin.svg</file>

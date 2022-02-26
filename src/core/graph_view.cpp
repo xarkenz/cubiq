@@ -251,11 +251,10 @@ namespace Cubiq {
         QPoint angleScroll = event->angleDelta() / 8;
 
         if (!pixelScroll.isNull()) {
-            zoom((float) pixelScroll.y() / 50,
-                 event->pos()); // TODO: pos() is deprecated in favor of position() in newer versions
+            zoom((float) pixelScroll.y() / 50, event->pos()); // TODO: pos() is deprecated in favor of position() in newer versions
         } else if (!angleScroll.isNull()) {
             // Usually 15 degrees per step
-            zoom((float) angleScroll.y() / 15, event->pos());
+            zoom((float) angleScroll.y() / 15, event->pos()); // TODO: see above
         }
 
         event->accept();
