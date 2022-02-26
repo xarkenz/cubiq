@@ -1,7 +1,5 @@
-<svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="#ff9421" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
-        <path stroke-width="4" d="M 32 32 m -22 -30 a 8 8 0 0 0 -8 8 l 0 44 a 8 8 0 0 0 8 8 l 44 0 a 8 8 0 0 0 8 -8 l 0 -44 a 8 8 0 0 0 -8 -8 z"/>
-        <path d="M 32 32 m 12 20 l -12 -20 c -12 -40 -40 -12 0 0"/>
-        <path d="M 32 32 m -12 20 l 12 -20 c 12 -40 40 -12 0 0"/>
+<svg version="1.1" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+    <g fill-rule="evenodd" fill="#aaa">
+        <path d="M 13 17 L 9.742 13.742 a 6 6 0 1 1 4 -4 L 16 12 L 18.258 9.742 a 6 6 0 1 1 4 4 L 19 17 l 7 7 l 0 6 l -10 -10 l -10 10 l 0 -6 l 7 -7 M 5 8 a 3 3 0 0 0 6 0 a 3 3 0 0 0 -6 0 M 21 8 a 3 3 0 0 0 6 0 a 3 3 0 0 0 -6 0"/>
     </g>
 </svg>

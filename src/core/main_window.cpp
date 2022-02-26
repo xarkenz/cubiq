@@ -127,6 +127,7 @@ namespace Cubiq {
         toolBar->addAction(aOpen);
         toolBar->addAction(aSave);
         toolBar->addAction(aSaveAs);
+        toolBar->addAction(aSettings);
         toolBar->addSeparator();
         toolBar->addAction(aCopy);
         toolBar->addAction(aCut);
