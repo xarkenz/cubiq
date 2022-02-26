@@ -1,8 +1,6 @@
 #pragma once
 
-#include <QOpenGLWidget>
-#include <QOpenGLExtraFunctions>
-#include <QMatrix4x4>
+#include <QWidget>
 #include <thread>
 
 #include "core/graph.h"
@@ -10,7 +8,7 @@
 
 namespace Cubiq {
 
-    class GraphView : public QOpenGLWidget, protected QOpenGLExtraFunctions {
+    class GraphView : public QWidget {
 
     private:
         class CalculationThread : public std::thread {
@@ -27,7 +25,6 @@ namespace Cubiq {
             void setGraph(Graph* g);
 
         private:
-
             void run();
 
             bool toUpdate;
@@ -51,38 +48,29 @@ namespace Cubiq {
         void centerOrigin();
 
     protected:
-        void initializeGL() override;
-        void resizeGL(int w, int h) override;
-        void paintGL() override;
+        void drawGrid(QPainter& painter);
+        void drawElements(QPainter& painter);
 
-        void drawGrid();
-        void drawElements();
-
+        void paintEvent(QPaintEvent* event) override;
+        void resizeEvent(QResizeEvent* event) override;
         void mousePressEvent(QMouseEvent* event) override;
         void mouseReleaseEvent(QMouseEvent* event) override;
         void mouseMoveEvent(QMouseEvent* event) override;
         void wheelEvent(QWheelEvent* event) override;
 
         void zoom(float steps, QPointF pos);
-        void adjustCamera();
-
-        GLuint createShader(const char* vertexSource, const char* fragmentSource, int attribCount, const char* attribs[]);
+        void adjustTransform();
 
         static void gridStepUp(float& space, int& major);
         static void gridStepDown(float& space, int& major);
 
     private:
-        float clearR, clearG, clearB;
-        int screenW, screenH;
+        QColor background;
 
         Graph* graph;
         CalculationThread calculationThread;
 
-        QMatrix4x4 projection;
-
-        GLuint shaderProgram{};
-        GLuint vertexArray{};
-        GLuint vertexBuffer{};
+        QTransform transform;
 
         QPoint dragStartPos;
         BoundingBox dragStartBounds;

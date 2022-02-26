@@ -21,8 +21,7 @@ namespace Cubiq {
     }
 
 
-    QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut,
-                                      const char* toolTip) {
+    QAction* MainWindow::createAction(const char* name, const char* text, const char* slot, const char* shortcut, const char* toolTip) {
         std::string iconFile(":/icons/");
         iconFile += name;
         auto* action = new QAction(QIcon(iconFile.c_str()), tr(text), this);
@@ -34,11 +33,6 @@ namespace Cubiq {
 
 
     void MainWindow::createGraphView() {
-        // Enable multisampling
-        QSurfaceFormat format;
-        format.setSamples(4);
-        graphView->setFormat(format);
-
         Graph* graph = graphView->getGraph();
 
         auto testFunc1 = [](float x) -> float { return 2.0f * sinf(x * 3.0f) + 2.0f * cosf(x * 1.3f); };
@@ -76,7 +70,7 @@ namespace Cubiq {
     void MainWindow::createEquationList() {
         equationDock->setWidget(equationList);
         equationList->setWordWrap(true);
-        equationList->addItem(tr("Cooper is working on this part right now. So... this will have to do for the moment."));
+        equationList->addItem(tr("There's nothing here yet. Divert your eyes."));
         addDockWidget(Qt::LeftDockWidgetArea, equationDock);
     }
 
