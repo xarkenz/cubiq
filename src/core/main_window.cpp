@@ -80,6 +80,7 @@ namespace Cubiq {
         std::cout << loadingIcon->renderer()->animated() << std::endl;
         loadingIcon->setMaximumSize(64, 64);
         loadingIcon->renderer()->setFramesPerSecond(30);*/
+        equationDock->setFeatures(QDockWidget::DockWidgetMovable);
         equationDock->setWidget(equationList);
         equationList->setWordWrap(true);
         equationList->addItem(tr("There's nothing here yet. Divert your eyes."));

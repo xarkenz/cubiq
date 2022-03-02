@@ -2,14 +2,14 @@
 const char* DARK_QSS = R"(
 
 QDialog {
-    background: #444;
+    background: #333;
     border: none;
     color: #ddd;
 }
 
 
 QDockWidget {
-    background: #444;
+    background: #333;
     border: none;
     color: #ddd;
     titlebar-close-icon: none;
@@ -57,7 +57,7 @@ QDockWidget::float-button:hover, QDockWidget::float-button:pressed {
 
 
 QListWidget {
-    background: #333;
+    background: #222;
     border: none;
     border-radius: 8px;
     color: #ddd;
@@ -67,20 +67,21 @@ QListWidget {
 
 
 QMainWindow {
-    background: #444;
+    background: #333;
     border: none;
     color: #ddd;
 }
 
 QMainWindow::separator {
-    background: #666;
+    background: #555;
     border: none;
-    width: 2px;
+    /*border-right: 2px solid #666;*/
+    width: 8px;
     height: 2px;
 }
 
 QMainWindow::separator:hover {
-    background: #39a0fa;
+    /*border-right-color: #39a0fa;*/
 }
 
 
